@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eskavator Tracker - CV Kembar Group</title>
+<link rel="manifest" href="/manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+:root { 
+--bg-dark: #121212; 
+--card-bg: #1c1c1c; 
+--card-tronton-bg: #131c2a; 
+--accent-yellow: #facc15; 
+--accent-maroon: #8b1818; 
+--accent-blue: #3b82f6; 
+--text-white: #ffffff;
+--text-gray: #a1a1aa;
+--accent-green: #22c55e;
+--shadow-dark: #0a0a0a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+body { 
+    background: var(--bg-dark); 
+    color: var(--text-white); 
+    padding: 15px; 
+    min-height: 100vh; 
+    overflow-x: hidden;
+    position: relative;
+}
+
+.container { max-width: 600px; margin: 30px auto 0 auto; width: 100%; position: relative; z-index: 2; }
+
+/* Styling SVG Icons */
+.svg-icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 6px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: inline-block; }
+.svg-icon-large { width: 32px; height: 32px; margin-bottom: 8px; }
+.icon-only { margin-right: 0; }
+
+#splash-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #090909; z-index: 9999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    animation: pulse-bg 2.5s infinite alternate;
+    transition: opacity 0.8s ease, visibility 0.8s;
+}
+@keyframes pulse-bg {
+    0% { background-color: #050505; box-shadow: inset 0 0 30px rgba(250, 204, 21, 0.05); }
+    100% { background-color: #111; box-shadow: inset 0 0 120px rgba(250, 204, 21, 0.15); }
+}
+#splash-screen img { width: 90px; animation: bounce-icon 2s infinite ease-in-out alternate; }
+@keyframes bounce-icon { 
+    0% { transform: scale(0.9); filter: drop-shadow(0 0 10px transparent); } 
+    100% { transform: scale(1.1); filter: drop-shadow(0 0 25px var(--accent-yellow)); } 
+}
+#splash-screen p { margin-top: 25px; color: var(--text-gray); letter-spacing: 3px; font-size: 12px; font-weight: 600; text-transform: uppercase; animation: kedip 1.5s infinite alternate; }
+
+#selection-screen, #history-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: transparent; z-index: 9998;
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    padding: 20px; transition: opacity 0.5s ease; overflow-y: auto;
+}
+#selection-screen { justify-content: center; }
+#history-screen { justify-content: flex-start; z-index: 9997; }
+
+/* Neumorphism Selection Screen */
+.btn-select {
+    width: 100%; padding: 25px 20px; font-size: 15px; border-radius: 24px;
+    animation: float-btn 4s infinite ease-in-out;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    border: none;
+}
+.btn-select:active {
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+.btn-select-esk { background: var(--card-bg); color: var(--accent-yellow); }
+.btn-select-trn { background: var(--card-tronton-bg); color: var(--accent-blue); animation-delay: 1s; }
+.btn-select-admin { background: #161616; color: var(--text-gray); animation-delay: 2s; padding: 18px; font-size: 13px; }
+.btn-select-admin:hover { color: white; }
+
+.selection-grid { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 340px; }
+
+@keyframes float-btn { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+.hidden-element { display: none !important; }
+
+/* Header Claymorphism */
+header {
+    background: var(--card-bg); padding: 20px 25px; border-radius: 24px; margin-bottom: 30px;
+    display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+    border: none;
+}
+.header-left { display: flex; align-items: center; gap: 15px; }
+.header-logo { width: 60px; height: auto; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5)); }
+.header-text h1 { color: var(--accent-yellow); font-size: 20px; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin-bottom: 2px; }
+.header-text p { color: var(--text-gray); font-size: 12px; }
+
+.btn-ganti-armada {
+    background: #111; color: var(--text-gray); border: none;
+    padding: 8px 14px; border-radius: 12px; font-size: 11px; cursor: pointer; transition: 0.3s;
+    display: flex; align-items: center; font-weight: bold; text-transform: uppercase;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+}
+.btn-ganti-armada:hover, .btn-ganti-armada:active { 
+    color: white; 
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.grid-container { display: flex; flex-direction: column; gap: 30px; }
+
+/* Cards Neumorphism/Claymorphism */
+.card { 
+    background: var(--card-bg); border-radius: 28px; padding: 30px; 
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+    border: none;
+}
+.card-tronton { 
+    background: var(--card-tronton-bg); 
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+    border: none;
+}
+.card-tronton h2 { border-left-color: var(--accent-blue); color: var(--accent-blue); }
+
+h2 { color: var(--accent-yellow); border-left: 4px solid var(--accent-yellow); padding-left: 12px; margin-bottom: 25px; font-size: 16px; text-transform: uppercase; display: flex; align-items: center; letter-spacing: 0.5px;}
+
+.status-indikator {
+    display: none; text-align: center; padding: 14px; margin-bottom: 25px; border-radius: 16px;
+    font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 13px;
+    background: #101010; color: var(--accent-green); border: none;
+    box-shadow: inset 4px 4px 10px rgba(0,0,0,0.8); animation: kedip 1.5s infinite alternate;
+}
+.status-aktif { display: flex; align-items: center; justify-content: center; }
+
+.form-group { margin-bottom: 20px; }
+label { display: block; font-size: 13px; margin-bottom: 8px; color: var(--text-gray); font-weight: 500;}
+
+/* Form Inputs Neumorphism */
+input:not([type="file"]), select { 
+    width: 100%; padding: 16px; background: #151515; border: none; border-radius: 16px; 
+    color: var(--accent-yellow); font-size: 14px; 
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 2px 4px rgba(0,0,0,0.3);
+    appearance: none; outline: none; transition: 0.3s;
+}
+input:not([type="file"]):focus, select:focus {
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 2px 4px rgba(0,0,0,0.3), 0 0 8px rgba(250, 204, 21, 0.3);
+}
+.card-tronton input:not([type="file"]), .card-tronton select { 
+    background: #0f1622; color: #60a5fa; 
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 2px 4px rgba(0,0,0,0.3);
+}
+.card-tronton input:not([type="file"]):focus, .card-tronton select:focus {
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 2px 4px rgba(0,0,0,0.3), 0 0 8px rgba(59, 130, 246, 0.3);
+}
+select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; }
+
+.btn-upload {
+    background: #141414 !important; color: var(--accent-yellow) !important; border: 1px dashed rgba(250, 204, 21, 0.3) !important;
+    box-shadow: inset 5px 5px 10px rgba(0,0,0,0.6), 2px 2px 5px rgba(255,255,255,0.02) !important; text-shadow: none !important;
+    display: flex; align-items: center; justify-content: center;
+}
+.btn-upload:active { box-shadow: inset 8px 8px 15px rgba(0,0,0,0.8) !important; }
+.card-tronton .btn-upload {
+    color: var(--accent-blue) !important; border-color: rgba(59, 130, 246, 0.3) !important;
+}
+.status-container { padding: 6px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-top: 10px; text-align: center; }
+
+/* Action Buttons Claymorphism */
+.btn { 
+    width: 100%; padding: 18px; border: none; border-radius: 18px; font-size: 14px; font-weight: bold; cursor: pointer; margin-bottom: 15px; text-transform: uppercase;
+    background: var(--accent-maroon); color: white; 
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+    display: flex; align-items: center; justify-content: center; letter-spacing: 0.5px; transition: 0.2s;
+}
+.btn:active {
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+    transform: translateY(2px);
+}
+.card-tronton .btn-mulai { background: var(--accent-blue); color: black; }
+.btn-riwayat { background: transparent; color: var(--accent-yellow); border: none; margin-top: 5px; box-shadow: none; font-size: 13px; text-decoration: underline; text-underline-offset: 4px; }
+.btn-riwayat:active { background: rgba(250, 204, 21, 0.1); }
+
+.btn:disabled {
+    background: #111 !important; color: #555 !important; border: none !important; 
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4) !important; cursor: not-allowed; transform: none;
+}
+
+/* History Styles Neumorphism */
+.riwayat-grid { display: flex; flex-direction: column; gap: 20px; }
+.riwayat-item {
+    background: var(--card-bg); padding: 20px; border-radius: 16px;
+    border-left: 4px solid var(--accent-yellow); font-size: 13px; position: relative;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+}
+.riwayat-item.pending { border-left-color: #ef4444; background: #221414; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3); }
+.riwayat-item p { margin-bottom: 6px; line-height: 1.4; }
+.riwayat-item strong { color: var(--text-white); }
+.riwayat-aksi { display: flex; gap: 12px; margin-top: 15px; }
+.btn-aksi { padding: 10px 12px; font-size: 12px; border-radius: 10px; cursor: pointer; font-weight: bold; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3); }
+.btn-edit { background: var(--accent-blue); }
+.btn-hapus { background: var(--accent-maroon); }
+
+div:where(.swal2-popup) { 
+    background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box, repeating-linear-gradient(-45deg, #000 0, #000 10px, var(--accent-yellow) 10px, var(--accent-yellow) 20px) border-box !important; border: 3px solid transparent !important; color: white !important; border-radius: 24px !important; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+div:where(.swal2-title) { color: var(--accent-yellow) !important; font-size: 20px !important; } 
+.swal2-confirm { background-color: var(--accent-yellow) !important; color: black !important; border-radius: 14px !important; }
+.swal2-image { max-height: 65vh !important; object-fit: contain !important; border-radius: 12px !important; width: 100% !important; margin-top: 10px !important; }
+.swal2-container { z-index: 100000 !important; }
+
+/* PC / TABLET ENHANCEMENTS: Neon Blur Animasi & Layout Semi Full-Screen */
+@media (max-width: 767px) { .card, .card-tronton { padding: 20px; } .btn-select { padding: 20px 15px; } header { padding: 15px; flex-direction: column; align-items: stretch; text-align: center; } .header-left { flex-direction: column; } .header-logo { width: 50px; margin: 0 auto; } }
+
+@media (min-width: 768px) {
+    body::before, body::after {
+        content: ""; position: fixed; width: 45vw; height: 45vw; border-radius: 50%;
+        filter: blur(120px); z-index: 0; animation: neon-float 20s infinite alternate ease-in-out; pointer-events: none;
+    }
+    body::before { background: rgba(250, 204, 21, 0.05); top: -15%; left: -15%; }
+    body::after { background: rgba(59, 130, 246, 0.05); bottom: -15%; right: -15%; animation-delay: -10s; }
+    
+    @keyframes neon-float {
+        0% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(15vw, 8vh) scale(1.1); }
+        100% { transform: translate(-5vw, 15vh) scale(0.9); }
+    }
+
+    .selection-grid { flex-direction: row; flex-wrap: wrap; max-width: 700px; justify-content: center; gap: 25px; }
+    .selection-grid .btn-select-esk, .selection-grid .btn-select-trn { flex: 1; min-width: 300px; }
+    .selection-grid .btn-select-admin { width: 100%; max-width: 400px; margin-top: 10px; }
+
+    .container { max-width: 1300px; margin-top: 40px; padding: 0 20px; }
+    .grid-container { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+        gap: 30px; align-items: start; 
+    }
+    .riwayat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    
+    header { padding: 25px 35px; }
+}
+</style>
+</head>
+<body>
+
+<svg style="display: none;">
+  <symbol id="icon-eskavator" viewBox="0 0 24 24"><path d="M3 10h5l3-4h6l2 4h3v6h-3a3 3 0 0 1-6 0H10a3 3 0 0 1-6 0H3v-6z"/><circle cx="6" cy="16" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="icon-tronton" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+  <symbol id="icon-camera" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="icon-back" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+  <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="icon-sync" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+  <symbol id="icon-check-circle" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+  <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  <symbol id="icon-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="icon-document" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 15 15"/></symbol>
+</svg>
+
+<div id="splash-screen">
+    <img src="icon.png" alt="Logo Animasi">
+    <p>Memuat Sistem...</p>
+</div>
+
+<div id="selection-screen" class="hidden-element">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <img src="icon.png" alt="Logo" style="width: 80px; margin-bottom: 20px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
+        <h2 style="color: white; border: none; font-size: 22px; margin: 0; padding:0; justify-content:center;">PILIH ARMADA ANDA</h2>
+        <p style="color: var(--text-gray); font-size: 14px; margin-top:5px;">Gunakan aplikasi sebagai:</p>
+    </div>
+    
+    <div class="selection-grid">
+        <button class="btn btn-select btn-select-esk" onclick="pilihRoleUtama('Eskavator')">
+            <svg class="svg-icon svg-icon-large icon-only"><use href="#icon-eskavator"></use></svg>
+            Operator & Kenet Eskavator
+        </button>
+        <button class="btn btn-select btn-select-trn" onclick="pilihRoleUtama('Tronton')">
+            <svg class="svg-icon svg-icon-large icon-only"><use href="#icon-tronton"></use></svg>
+            Supir & Kenet Tronton
+        </button>
+        <button class="btn btn-select btn-select-admin" onclick="window.location.href='/dashboard_admin.html'">
+            <svg class="svg-icon svg-icon-large icon-only" style="width: 24px; height:24px; margin-bottom: 4px;"><use href="#icon-lock"></use></svg>
+            Masuk Sebagai Admin
+        </button>
+    </div>
+</div>
+
+<div id="history-screen" class="hidden-element">
+    <div class="container" style="margin-top: 0;">
+        <button class="btn" style="background: var(--card-bg); color: var(--text-white); margin-bottom: 25px; padding: 14px;" onclick="tutupRiwayat()">
+            <svg class="svg-icon"><use href="#icon-back"></use></svg> Kembali ke Menu Utama
+        </button>
+        <h2>Riwayat Pengeluaran</h2>
+        
+        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 25px;">
+            <div class="form-group" style="flex:1; min-width:160px;"><input type="date" id="filter-tanggal" onchange="renderRiwayat()"></div>
+            <div class="form-group" style="flex:2; min-width:220px;"><input type="text" id="filter-teks" placeholder="Cari keterangan/jenis..." oninput="renderRiwayat()"></div>
+        </div>
+
+        <div id="list-riwayat" class="riwayat-grid">
+        </div>
+    </div>
+</div>
+
+<div id="main-app" class="hidden-element">
+    <div class="container">
+    <header>
+        <div class="header-left">
+            <img src="icon.png" alt="Logo" class="header-logo">
+            <div class="header-text">
+                <h1>ESKAVATOR TRACKER</h1>
+                <p>CV Kembar Group LSM</p>
+            </div>
+        </div>
+        <button class="btn-ganti-armada" onclick="gantiArmada()">
+            <svg class="svg-icon icon-only" style="margin-right: 5px;"><use href="#icon-sync"></use></svg> Ganti Armada
+        </button>
+    </header>
+
+    <div class="grid-container">
+
+        <div class="card" id="card-eskavator">
+            <h2><svg class="svg-icon"><use href="#icon-eskavator"></use></svg> Eskavator Operasional</h2>
+            <div id="indikator-esk" class="status-indikator">
+                <svg class="svg-icon" style="fill: var(--accent-green)"><use href="#icon-check-circle"></use></svg> ESKAVATOR BEROPERASI
+            </div>
+
+            <div class="form-group">
+                <label>Pilih Unit Eskavator</label>
+                <select id="pilihAsetEsk">
+                    <option value="">Memuat data unit...</option>
+                </select>
+            </div>
+
+            <div class="form-group"><label>Operator Eskavator</label><input type="text" id="operator" placeholder="Nama"></div>
+            <div class="form-group"><label>Kenet Eskavator</label><input type="text" id="kenet" placeholder="Nama"></div>
+            <div class="form-group"><label>Lokasi Proyek</label><input type="text" id="lokasiTeks" placeholder="Lokasi"></div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-upload" id="btn-foto1" onclick="pilihSumberFoto('foto1')">
+                    <svg class="svg-icon"><use href="#icon-camera"></use></svg> Pilih Foto Eskavator
+                </button>
+                <div class="status-container"><span id="status-foto1" style="font-size: 11px; color: var(--text-gray);">Belum ada foto yang dipilih</span></div>
+                <input type="file" id="foto1" accept="image/*" style="display: none;" onchange="updateStatusFoto('foto1')">
+            </div>
+
+            <button id="btn-mulai-esk" class="btn" style="background: var(--accent-green);" onclick="kirimAktivitas('start_session', 'Eskavator')">Mulai Operasi</button>
+            <button class="btn" style="background: var(--accent-maroon);" onclick="kirimAktivitas('end_session', 'Eskavator')">Selesai Operasi</button>
+        </div>
+
+        <div class="card card-tronton" id="card-tronton">
+            <h2><svg class="svg-icon"><use href="#icon-tronton"></use></svg> Mobil Angkut (Tronton)</h2>
+            <div id="indikator-trn" class="status-indikator">
+                <svg class="svg-icon" style="fill: var(--accent-green)"><use href="#icon-check-circle"></use></svg> TRONTON BERJALAN
+            </div>
+
+            <div class="form-group">
+                <label>Pilih Unit Tronton</label>
+                <select id="pilihAsetTrn">
+                    <option value="">Memuat data unit...</option>
+                </select>
+            </div>
+
+            <div class="form-group"><label>Supir Tronton</label><input type="text" id="supirTronton" placeholder="Nama Supir (Ketik untuk auto isi Kenet)"></div>
+            <div class="form-group"><label>Kenet Tronton</label><input type="text" id="kenetTronton" placeholder="Otomatis / Manual"></div>
+            <div class="form-group"><label>Tujuan / Lokasi</label><input type="text" id="lokasiTronton" placeholder="Lokasi Bongkar Muat"></div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-upload" id="btn-foto-trn" onclick="pilihSumberFoto('fotoTronton')">
+                    <svg class="svg-icon"><use href="#icon-camera"></use></svg> Pilih Foto Tronton
+                </button>
+                <div class="status-container"><span id="status-fotoTronton" style="font-size: 11px; color: var(--text-gray);">Belum ada foto yang dipilih</span></div>
+                <input type="file" id="fotoTronton" accept="image/*" style="display: none;" onchange="updateStatusFoto('fotoTronton')">
+            </div>
+
+            <button id="btn-mulai-trn" class="btn btn-mulai" onclick="kirimAktivitas('start_session', 'Tronton')">Mulai Jalan (Trip)</button>
+            <button class="btn" style="background: var(--accent-maroon);" onclick="kirimAktivitas('end_session', 'Tronton')">Selesai (Sampai)</button>
+        </div>
+
+        <div class="card"> 
+            <h2><svg class="svg-icon"><use href="#icon-document"></use></svg> Input Pengeluaran / Uang Jalan</h2>
+            <input type="hidden" id="modeEditID" value="">
+            
+            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                <div class="form-group" style="flex:1; min-width:180px;"><label>Pengeluaran Untuk</label>
+                    <select id="targetArmada">
+                        <option value="Eskavator">Eskavator</option>
+                        <option value="Tronton">Mobil Tronton</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex:1; min-width:180px;"><label>Kategori</label>
+                    <select id="jenis">
+                        <option value="">-- Pilih --</option>
+                        <option value="BBM">BBM / Solar</option>
+                        <option value="Servis">Servis / Tambal Ban</option>
+                        <option value="Sparepart">Beli Sparepart</option>
+                        <option value="Konsumsi">Makan / Uang Jalan</option>
+                        <option value="Mob-Demob">Mob-Demob (Khusus Tronton)</option>
+                        <option value="Kawal">Kawal / Koordinasi</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                <div class="form-group" style="flex:1; min-width:180px;"><label>Nominal (Rp)</label><input type="text" id="nominal" placeholder="Rp 0"></div>
+                <div class="form-group" style="flex:2; min-width:180px;"><label>Keterangan Lengkap</label><input type="text" id="keteranganBiaya" placeholder="Cth: Beli solar 20L"></div>
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-upload" id="btn-foto2" onclick="pilihSumberFoto('foto2')">
+                    <svg class="svg-icon"><use href="#icon-document"></use></svg> Pilih Foto Nota / Bukti
+                </button>
+                <div class="status-container"><span id="status-foto2" style="font-size: 11px; color: var(--text-gray);">Belum ada nota yang dipilih</span></div>
+                <input type="file" id="foto2" accept="image/*" style="display: none;" onchange="updateStatusFoto('foto2')">
+            </div>
+
+            <button class="btn" id="btn-simpan-biaya" style="background: var(--accent-green);" onclick="validasiBiaya()">Simpan Pengeluaran</button>
+            <button class="btn btn-riwayat" onclick="bukaRiwayat()">Lihat Riwayat Pengeluaran</button>
+        </div>
+
+    </div> 
+    </div>
+</div> 
+
+<script>
+// PASTIKAN LINK INI SAMA DENGAN DEPLOY TERBARU KAMU
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw6H0zUU7UzVg7iOXRbf5nOoL3qLr6gWVofMnxLVAGNzGRtLCxbKCmdbNdkFp36YN7ZNw/exec";
+
+let sesiEskavator = localStorage.getItem('sesi_eskavator') || "";
+let sesiTronton = localStorage.getItem('sesi_tronton') || "";
+
+window.addEventListener('DOMContentLoaded', () => {
+    muatDaftarAset();
+    setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        splash.style.opacity = '0';
+        setTimeout(() => {
+            splash.classList.add('hidden-element');
+            cekMemoriArmada();
+            setInterval(prosesAntreanPending, 1000); 
+        }, 800);
+    }, 2500);
+
+    const arrInputs = ['operator', 'kenet', 'lokasiTeks', 'supirTronton', 'kenetTronton', 'lokasiTronton', 'pilihAsetEsk', 'pilihAsetTrn'];
+    arrInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if(localStorage.getItem('saved_'+id)) el.value = localStorage.getItem('saved_'+id);
+        el.addEventListener('change', () => localStorage.setItem('saved_'+id, el.value));
+        el.addEventListener('input', () => localStorage.setItem('saved_'+id, el.value));
+    });
+    aturTampilanSesi();
+    document.getElementById('filter-tanggal').valueAsDate = new Date();
+});
+
+function muatDaftarAset() {
+    const asetEsk = document.getElementById('pilihAsetEsk');
+    const asetTrn = document.getElementById('pilihAsetTrn');
+
+    const cached = localStorage.getItem('backup_dash_kembar');
+    if(cached) {
+        try {
+            const res = JSON.parse(cached);
+            if(res.data && res.data.aset) renderDropdownAset(res.data.aset);
+        } catch(e) {}
+    }
+
+    fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({action: 'get_dashboard'}) })
+    .then(r => r.json())
+    .then(res => {
+        if(res.status === 'success' && res.data.aset) {
+            localStorage.setItem('backup_dash_kembar', JSON.stringify(res)); 
+            renderDropdownAset(res.data.aset);
+        }
+    }).catch(err => console.log("Gagal memuat aset dari server."));
+}
+
+function renderDropdownAset(dataAset) {
+    const asetEsk = document.getElementById('pilihAsetEsk');
+    const asetTrn = document.getElementById('pilihAsetTrn');
+    
+    let htmlEsk = '<option value="">-- Pilih Unit Eskavator --</option>';
+    let htmlTrn = '<option value="">-- Pilih Unit Tronton --</option>';
+
+    dataAset.forEach(aset => {
+        const namaPanggung = aset["NAMA PANGGUNG"] || aset[1] || "Tanpa Nama";
+        const idAset = aset["ID ASET"] || aset[0];
+        const jenis = (aset["JENIS ARMADA"] || aset[2] || "").toLowerCase();
+        
+        if(jenis.includes("eskavator")) {
+            htmlEsk += `<option value="${idAset}">${namaPanggung}</option>`;
+        } else if(jenis.includes("tronton")) {
+            htmlTrn += `<option value="${idAset}">${namaPanggung}</option>`;
+        }
+    });
+
+    asetEsk.innerHTML = htmlEsk;
+    asetTrn.innerHTML = htmlTrn;
+    
+    if(localStorage.getItem('saved_pilihAsetEsk')) asetEsk.value = localStorage.getItem('saved_pilihAsetEsk');
+    if(localStorage.getItem('saved_pilihAsetTrn')) asetTrn.value = localStorage.getItem('saved_pilihAsetTrn');
+}
+
+function cekMemoriArmada() {
+    const savedRole = localStorage.getItem('pilihan_armada');
+    if (savedRole) tampilkanInterface(savedRole);
+    else document.getElementById('selection-screen').classList.remove('hidden-element');
+}
+
+function pilihRoleUtama(role) {
+    localStorage.setItem('pilihan_armada', role);
+    const selection = document.getElementById('selection-screen');
+    selection.style.opacity = '0';
+    setTimeout(() => {
+        selection.classList.add('hidden-element'); selection.style.opacity = '1';
+        tampilkanInterface(role);
+    }, 500);
+}
+
+function tampilkanInterface(role) {
+    document.getElementById('main-app').classList.remove('hidden-element');
+    const formEsk = document.getElementById('card-eskavator');
+    const formTrn = document.getElementById('card-tronton');
+    const dropdownArmada = document.getElementById('targetArmada');
+
+    if (role === 'Eskavator') {
+        formEsk.style.display = 'block'; formTrn.style.display = 'none'; dropdownArmada.value = 'Eskavator';
+    } else {
+        formEsk.style.display = 'none'; formTrn.style.display = 'block'; dropdownArmada.value = 'Tronton';
+    }
+}
+
+function gantiArmada() {
+    Swal.fire({
+        title: 'Ganti Armada?', icon: 'question', showCancelButton: true,
+        confirmButtonColor: 'var(--accent-yellow)', cancelButtonColor: 'var(--accent-maroon)', confirmButtonText: 'Ya, Ganti'
+    }).then((res) => {
+        if (res.isConfirmed) {
+            localStorage.removeItem('pilihan_armada');
+            document.getElementById('main-app').classList.add('hidden-element');
+            document.getElementById('selection-screen').classList.remove('hidden-element');
+        }
+    });
+}
+
+const daftarPasanganTronton = {
+    "Pak Budi": "Andi Kenet",
+    "Ucok": "Slamet",
+    "Jali": "Bambang"
+};
+
+document.getElementById('supirTronton').addEventListener('input', function() {
+    const supirDiketik = this.value;
+    if(daftarPasanganTronton[supirDiketik]) {
+        document.getElementById('kenetTronton').value = daftarPasanganTronton[supirDiketik];
+        localStorage.setItem('saved_kenetTronton', daftarPasanganTronton[supirDiketik]);
+    }
+});
+
+function aturTampilanSesi() {
+    const btnMulaiEsk = document.getElementById('btn-mulai-esk');
+    const indEsk = document.getElementById('indikator-esk');
+    if (sesiEskavator) { btnMulaiEsk.disabled = true; btnMulaiEsk.innerHTML = `<svg class="svg-icon"><use href="#icon-sync"></use></svg> Beroperasi...`; indEsk.classList.add('status-aktif'); } 
+    else { btnMulaiEsk.disabled = false; btnMulaiEsk.innerText = "Mulai Operasi"; indEsk.classList.remove('status-aktif'); }
+
+    const btnMulaiTrn = document.getElementById('btn-mulai-trn');
+    const indTrn = document.getElementById('indikator-trn');
+    if (sesiTronton) { btnMulaiTrn.disabled = true; btnMulaiTrn.innerHTML = `<svg class="svg-icon"><use href="#icon-sync"></use></svg> Trip Berjalan...`; indTrn.classList.add('status-aktif'); } 
+    else { btnMulaiTrn.disabled = false; btnMulaiTrn.innerText = "Mulai Jalan (Trip)"; indTrn.classList.remove('status-aktif'); }
+}
+
+function pilihSumberFoto(idInput) {
+    Swal.fire({
+        title: 'Pilih Sumber Foto', text: 'Mau ambil foto dari mana?',
+        showDenyButton: true, showCancelButton: true,
+        confirmButtonText: 'Buka Kamera', denyButtonText: 'Pilih Galeri', cancelButtonText: 'Batal',
+        confirmButtonColor: 'var(--accent-yellow)', cancelButtonColor: '#ef4444'
+    }).then((result) => {
+        const input = document.getElementById(idInput);
+        if (result.isConfirmed) { input.setAttribute('capture', 'environment'); input.click(); } 
+        else if (result.isDenied) { input.removeAttribute('capture'); input.click(); }
+    });
+}
+
+function updateStatusFoto(idInput) {
+    const input = document.getElementById(idInput);
+    const statusText = document.getElementById('status-' + idInput);
+    const btn = document.getElementById('btn-' + (idInput==='fotoTronton' ? 'foto-trn' : idInput));
+
+    if(input.files && input.files[0]) {
+        statusText.innerHTML = "✔️ Foto siap: " + input.files[0].name;
+        statusText.style.color = "var(--accent-yellow)";
+        btn.innerHTML = `<svg class="svg-icon"><use href="#icon-camera"></use></svg> Ganti Foto ${idInput.includes('Tronton') ? 'Tronton' : (idInput==='foto2' ? 'Nota' : 'Eskavator')}`;
+    } else {
+        statusText.innerHTML = "Belum ada foto yang dipilih";
+        statusText.style.color = "var(--text-gray)";
+        btn.innerHTML = `<svg class="svg-icon"><use href="#icon-camera"></use></svg> Pilih Foto ${idInput.includes('Tronton') ? 'Tronton' : (idInput==='foto2' ? 'Nota' : 'Eskavator')}`;
+    }
+}
+
+const nominalInput = document.getElementById('nominal');
+nominalInput.addEventListener('input', function() {
+    let value = this.value.replace(/[^,\d]/g, '');
+    let split = value.split(',');
+    let sisa = split[0].length % 3;
+    let rupiah = split[0].substr(0, sisa);
+    let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    if(ribuan) rupiah += (sisa ? '.' : '') + ribuan.join('.');
+    this.value = rupiah ? 'Rp ' + (split[1] != undefined ? rupiah + ',' + split[1] : rupiah) : '';
+});
+
+const dbName = "EskavatorDB"; const storeName = "AntreanData"; let db;
+const requestDB = indexedDB.open(dbName, 1);
+requestDB.onupgradeneeded = (e) => { db = e.target.result; db.createObjectStore(storeName, { autoIncrement: true }); };
+requestDB.onsuccess = (e) => { db = e.target.result; if(navigator.onLine) kirimAntrean(); };
+
+function simpanKeAntrean(payload, tipeSesi, idBaru) {
+    if (!db) return;
+    db.transaction(storeName, "readwrite").objectStore(storeName).add({ payload, tipeSesi, idBaru });
+
+    if(tipeSesi === 'mulai_Eskavator') { sesiEskavator = idBaru; localStorage.setItem('sesi_eskavator', idBaru); }
+    else if(tipeSesi === 'selesai_Eskavator') { sesiEskavator = ""; localStorage.removeItem('sesi_eskavator'); }
+    else if(tipeSesi === 'mulai_Tronton') { sesiTronton = idBaru; localStorage.setItem('sesi_tronton', idBaru); }
+    else if(tipeSesi === 'selesai_Tronton') { sesiTronton = ""; localStorage.removeItem('sesi_tronton'); }
+
+    Swal.fire({ icon: 'info', title: 'Masuk Antrean Offline!', text: 'Sinyal hilang. Data otomatis dikirim saat sinyal kembali.', confirmButtonText: 'Lanjut Kerja' });
+    resetForm(); aturTampilanSesi(); 
+}
+
+function resetForm() {
+    document.getElementById('foto1').value = ""; document.getElementById('fotoTronton').value = ""; 
+    document.getElementById('foto2').value = ""; document.getElementById('nominal').value = ""; 
+    document.getElementById('jenis').value = ""; document.getElementById('keteranganBiaya').value = "";
+    document.getElementById('modeEditID').value = ""; 
+    document.getElementById('btn-simpan-biaya').innerHTML = "Simpan Pengeluaran";
+    updateStatusFoto('foto1'); updateStatusFoto('fotoTronton'); updateStatusFoto('foto2');
+}
+
+function prosesKirim(payload, tipeSesi, idBaru, isSilent = false) {
+    if (!navigator.onLine) return simpanKeAntrean(payload, tipeSesi, idBaru);
+    if (!isSilent) Swal.fire({ title: 'Mengirim Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) })
+    .then(r => r.json()).then(res => {
+        if(res.status === "success") {
+            if(tipeSesi === 'mulai_Eskavator') { sesiEskavator = idBaru; localStorage.setItem('sesi_eskavator', idBaru); }
+            else if(tipeSesi === 'selesai_Eskavator') { sesiEskavator = ""; localStorage.removeItem('sesi_eskavator'); }
+            else if(tipeSesi === 'mulai_Tronton') { sesiTronton = idBaru; localStorage.setItem('sesi_tronton', idBaru); }
+            else if(tipeSesi === 'selesai_Tronton') { sesiTronton = ""; localStorage.removeItem('sesi_tronton'); }
+
+            if (!isSilent) {
+                Swal.fire("Berhasil", res.message, "success");
+                resetForm(); aturTampilanSesi(); 
+                muatDaftarAset(); 
+            }
+        } else {
+            if (!isSilent) Swal.fire("Gagal", res.message, "error");
+        }
+    }).catch(() => simpanKeAntrean(payload, tipeSesi, idBaru));
+}
+
+window.addEventListener('online', () => setTimeout(kirimAntrean, 3000));
+
+function kirimAntrean() {
+    if (!db || !navigator.onLine) return;
+    const tx = db.transaction(storeName, "readonly");
+    const store = tx.objectStore(storeName);
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+        const keysReq = store.getAllKeys();
+        keysReq.onsuccess = () => {
+            const antrean = request.result;
+            const keys = keysReq.result;
+        if (antrean.length === 0) return;
+
+        Swal.fire({
+            title: 'Sinyal Kembali!',
+            text: `Mengirim ${antrean.length} data offline ke server...`,
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        let terkirim = 0;
+        let promises = antrean.map((item, index) => {
+            return fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(item.payload) })
+            .then(r => r.json())
+            .then(res => {
+                if (res.status === "success") {
+                    db.transaction(storeName, "readwrite").objectStore(storeName).delete(keys[index]);
+                    terkirim++;
+                }
+            }).catch(e => console.log("Gagal kirim", e));
+        });
+
+        Promise.all(promises).then(() => {
+            if (terkirim > 0) {
+                Swal.fire("Sinkronisasi Selesai", `${terkirim} data berhasil diunggah!`, "success");
+                muatDaftarAset();
+                aturTampilanSesi();
+            } else {
+                Swal.close();
+            }
+        });
+        };
+    };
+}
+
+function dapatkanWatermark(file, op, kn, lokasiManual, callback) {
+    Swal.fire({ title: 'Mencetak Watermark...', text: 'Tahan sebentar...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => prosesCanvas(file, op, kn, lokasiManual, `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`, callback),
+            () => prosesCanvas(file, op, kn, lokasiManual, "GPS Tdk Aktif", callback), { enableHighAccuracy: true, timeout: 10000 }
+        );
+    } else prosesCanvas(file, op, kn, lokasiManual, "No GPS", callback);
+}
+
+function prosesCanvas(file, op, kn, lokasiManual, gpsStr, callback) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+            canvas.width = img.width; canvas.height = img.height; ctx.drawImage(img, 0, 0);
+            const fs = Math.max(22, canvas.width * 0.032); ctx.font = `500 ${fs}px sans-serif`; 
+            const txt = [`Waktu: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID')}`, `Lokasi: ${lokasiManual}`, `GPS: ${gpsStr}`, `Ptg: ${op} | ${kn}`];
+            ctx.fillStyle = "rgba(0, 0, 0, 0.65)"; ctx.fillRect(20, canvas.height - (fs*4 + 40), 500, fs*4 + 20);
+            ctx.fillStyle = "#ffffff"; txt.forEach((t, i) => ctx.fillText(t, 35, canvas.height - (fs*4 + 20) + (i*fs*1.3)));
+            
+            callback(canvas.toDataURL('image/jpeg', 0.85), lokasiManual);
+        }
+        img.src = e.target.result;
+    }
+    reader.readAsDataURL(file);
+}
+
+function kirimAktivitas(aksi, armada) {
+    const isTronton = armada === 'Tronton';
+    const unitAsetID = document.getElementById(isTronton ? 'pilihAsetTrn' : 'pilihAsetEsk').value;
+    const op = document.getElementById(isTronton ? 'supirTronton' : 'operator').value.trim(); 
+    const kn = document.getElementById(isTronton ? 'kenetTronton' : 'kenet').value.trim(); 
+    const lok = document.getElementById(isTronton ? 'lokasiTronton' : 'lokasiTeks').value.trim();
+    const file = document.getElementById(isTronton ? 'fotoTronton' : 'foto1').files[0];
+    const sesiBerjalan = isTronton ? sesiTronton : sesiEskavator;
+
+    if(!unitAsetID) return Swal.fire("Oops", `Silakan pilih Unit ${armada} terlebih dahulu di menu Dropdown!`, "warning");
+    if(!op || !kn || !lok || !file) return Swal.fire("Oops", `Lengkapi data form & Pilih Foto ${armada}!`, "warning");
+    if(aksi === 'end_session' && !sesiBerjalan) return Swal.fire("Gagal", `${armada} belum MULAI operasi!`, "error");
+
+    const idSesi = aksi === 'start_session' ? (isTronton ? "TRN-" : "ESK-") + Date.now() : sesiBerjalan;
+
+    dapatkanWatermark(file, op, kn, lok, (base64Img, fixLokasi) => {
+        prosesKirim({ 
+            action: aksi, sessionId: idSesi, armada: armada, idAset: unitAsetID,
+            tanggal: new Date().toLocaleDateString('id-ID'), petugas: `${op} & ${kn}`, lokasi: fixLokasi,
+            jamMulai: aksi === 'start_session' ? new Date().toLocaleString('sv-SE').replace('T', ' ') : "", 
+            jamSelesai: aksi === 'end_session' ? new Date().toLocaleString('sv-SE').replace('T', ' ') : "", 
+            image: base64Img 
+        }, aksi === 'start_session' ? 'mulai_'+armada : 'selesai_'+armada, idSesi);
+    });
+}
+
+function validasiBiaya() {
+    const armada = document.getElementById('targetArmada').value;
+    const sesiTujuan = armada === 'Tronton' ? sesiTronton : sesiEskavator;
+    const modeEditID = document.getElementById('modeEditID').value;
+
+    const j = document.getElementById('jenis').value; 
+    const ket = document.getElementById('keteranganBiaya').value.trim();
+    const n = document.getElementById('nominal').value.replace(/[^0-9]/g, ''); 
+    const file = document.getElementById('foto2').files[0]; 
+
+    if(!sesiTujuan) return Swal.fire("Gagal", `Tidak ada sesi aktif untuk ${armada}. Mulai operasi/trip dulu!`, "error");
+    if(!j || !ket || !n || !file) return Swal.fire("Peringatan", "Lengkapi form pengeluaran & Nota!", "warning");
+
+    const op = document.getElementById(armada === 'Tronton' ? 'supirTronton' : 'operator').value.trim(); 
+    const kn = document.getElementById(armada === 'Tronton' ? 'kenetTronton' : 'kenet').value.trim();
+    const d = new Date();
+    const strTglRaw = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+
+    Swal.fire({ title: 'Memproses Nota...', text: 'Mengecilkan ukuran foto...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800; 
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height && width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+            } else if (height > MAX_WIDTH) {
+                width *= MAX_WIDTH / height;
+                height = MAX_WIDTH;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+
+            const payload = { 
+                action: "add_expense",
+                idPengeluaran: modeEditID || ("PENDING-" + Date.now()), 
+                sessionId: sesiTujuan, armada: armada,
+                tanggal: d.toLocaleDateString('id-ID'), tanggalRaw: strTglRaw, waktuTeks: d.toLocaleTimeString('id-ID'),
+                petugas: `${op} & ${kn}`, jenis: j, keterangan: ket, nominal: n, image: compressedBase64, 
+                waktuDibuat: Date.now() 
+            };
+
+            let pending = JSON.parse(localStorage.getItem('antrean_tunda')) || [];
+            if(modeEditID) pending = pending.filter(p => p.idPengeluaran !== modeEditID); 
+            pending.push(payload);
+            localStorage.setItem('antrean_tunda', JSON.stringify(pending));
+
+            Swal.fire({
+                icon: 'success', title: 'Data Ditahan 1 Menit',
+                text: 'Masuk antrean. Anda punya 1 menit untuk revisi/hapus di menu Riwayat.',
+                timer: 3000, showConfirmButton: false
+            });
+            resetForm();
+            if(!document.getElementById('history-screen').classList.contains('hidden-element')) renderRiwayat();
+        };
+        img.src = e.target.result;
+    }
+    reader.readAsDataURL(file);
+}
+
+function prosesAntreanPending() {
+    let pending = JSON.parse(localStorage.getItem('antrean_tunda')) || [];
+    let terkirimLokal = JSON.parse(localStorage.getItem('riwayat_terkirim')) || [];
+    let adaPerubahan = false;
+
+    for (let i = pending.length - 1; i >= 0; i--) {
+        const sisaWaktu = 60000 - (Date.now() - pending[i].waktuDibuat);
+        if (sisaWaktu <= 0) {
+            const dataKirim = pending[i];
+            pending.splice(i, 1);
+            adaPerubahan = true;
+            
+            dataKirim.idPengeluaran = dataKirim.idPengeluaran.replace("PENDING-", "EXP-");
+
+            terkirimLokal.unshift(dataKirim); 
+            if(terkirimLokal.length > 15) terkirimLokal.pop();
+            localStorage.setItem('riwayat_terkirim', JSON.stringify(terkirimLokal));
+
+            prosesKirim(dataKirim, 'biaya', null, true);
+        }
+    }
+
+    if (adaPerubahan) {
+        localStorage.setItem('antrean_tunda', JSON.stringify(pending));
+        if(!document.getElementById('history-screen').classList.contains('hidden-element')) renderRiwayat();
+    }
+}
+
+function bukaRiwayat() {
+    document.getElementById('main-app').classList.add('hidden-element');
+    document.getElementById('history-screen').classList.remove('hidden-element');
+    renderRiwayat();
+}
+
+function tutupRiwayat() {
+    document.getElementById('history-screen').classList.add('hidden-element');
+    document.getElementById('main-app').classList.remove('hidden-element');
+}
+
+function lihatFotoNota(idPengeluaran) {
+    let pending = JSON.parse(localStorage.getItem('antrean_tunda')) || [];
+    let terkirim = JSON.parse(localStorage.getItem('riwayat_terkirim')) || [];
+    let data = pending.find(r => r.idPengeluaran === idPengeluaran) || terkirim.find(r => r.idPengeluaran === idPengeluaran);
+    
+    if(!data || !data.image) {
+        return Swal.fire("Oops", "Foto nota tidak ditemukan.", "error");
+    }
+    
+    Swal.fire({
+        title: 'Foto Nota',
+        imageUrl: data.image,
+        imageAlt: 'Foto Bukti Pengeluaran',
+        confirmButtonColor: 'var(--accent-yellow)',
+        confirmButtonText: 'Tutup'
+    });
+}
+
+function renderRiwayat() {
+    const list = document.getElementById('list-riwayat');
+    let pending = JSON.parse(localStorage.getItem('antrean_tunda')) || [];
+    let terkirim = JSON.parse(localStorage.getItem('riwayat_terkirim')) || [];
+    
+    pending.forEach(p => p.statusRiwayat = 'pending');
+    terkirim.forEach(t => t.statusRiwayat = 'terkirim');
+
+    const tglFilter = document.getElementById('filter-tanggal').value;
+    const teksFilter = document.getElementById('filter-teks').value.toLowerCase();
+
+    let gabungan = [...pending, ...terkirim].filter(r => {
+        const cocokTgl = r.tanggalRaw === tglFilter;
+        const cocokTeks = r.jenis.toLowerCase().includes(teksFilter) || r.keterangan.toLowerCase().includes(teksFilter);
+        return (!tglFilter || cocokTgl) && (!teksFilter || cocokTeks);
+    });
+
+    list.innerHTML = "";
+    if(gabungan.length === 0) {
+        list.innerHTML = "<p style='color: var(--text-gray); font-size: 13px; grid-column: 1 / -1;'>Belum ada data di hari ini.</p>";
+        return;
+    }
+
+    gabungan.forEach(r => {
+        const isPending = r.statusRiwayat === 'pending';
+        let sisaDetik = 0;
+        if(isPending) {
+            const sisaMs = 60000 - (Date.now() - r.waktuDibuat);
+            sisaDetik = sisaMs > 0 ? Math.floor(sisaMs / 1000) : 0;
+        }
+
+        let formatUang = r.nominal.toString().includes("Rp") ? r.nominal : "Rp " + Number(r.nominal).toLocaleString('id-ID');
+
+        const div = document.createElement('div');
+        div.className = `riwayat-item ${isPending ? 'pending' : ''}`;
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--text-gray); font-size:11px;">📅 ${r.tanggal} | ⏰ ${r.waktuTeks}</span>
+                <strong style="color:var(--accent-yellow); font-size:14px;">${formatUang}</strong>
+            </div>
+            <p style="margin-top:8px;"><strong>${r.jenis}</strong> - ${r.keterangan}</p>
+            <p style="font-size:11px; color:var(--text-gray);">Armada: ${r.armada || '-'}</p>
+            
+            <div style="margin-top:10px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display:flex; align-items:center;">
+                    ${isPending ? `<svg class="svg-icon" style="color:#ef4444; width:14px; height:14px;"><use href="#icon-clock"></use></svg><span style="font-size:11px; color:#ef4444; font-weight:bold;">Tunggu (${sisaDetik}s)...</span>` : `<svg class="svg-icon" style="color:var(--accent-green); width:14px; height:14px;"><use href="#icon-check-circle"></use></svg><span style="font-size:11px; color:var(--accent-green);">Terkirim</span>`}
+                </div>
+                <button style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-white); padding: 5px 10px; font-size: 11px; border-radius: 8px; cursor: pointer; transition: 0.3s; display:flex; align-items:center;" onmouseover="this.style.borderColor='white'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)'" onclick="lihatFotoNota('${r.idPengeluaran}')"><svg class="svg-icon icon-only" style="margin-right:4px; width:12px; height:12px;"><use href="#icon-document"></use></svg> Nota</button>
+            </div>
+            
+            ${isPending ? `
+            <div class="riwayat-aksi" style="margin-top:12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+                <button class="btn-aksi btn-edit" style="flex:1;" onclick="masukModeEdit('${r.idPengeluaran}')"><svg class="svg-icon icon-only" style="margin-right:4px; width:12px; height:12px;"><use href="#icon-edit"></use></svg> Revisi</button>
+                <button class="btn-aksi btn-hapus" style="flex:1;" onclick="hapusPendingLokal('${r.idPengeluaran}')"><svg class="svg-icon icon-only" style="margin-right:4px; width:12px; height:12px;"><use href="#icon-trash"></use></svg> Hapus</button>
+            </div>
+            ` : ''}
+        `;
+        list.appendChild(div);
+    });
+}
+
+function masukModeEdit(idPending) {
+    let pending = JSON.parse(localStorage.getItem('antrean_tunda')) || [];
+    let data = pending.find(r => r.idPengeluaran === idPending);
+    if(!data) return;
+
+    tutupRiwayat();
+    document.getElementById('modeEditID').value = data.idPengeluaran;
+    document.getElementById('targetArmada').value = data.armada;
+    document.getElementById('jenis').value = data.jenis;
+    document.getElementById('keteranganBiaya').value = data.keterangan;
+    document.getElementById('nominal').value = "Rp " + Number(data.nominal).toLocaleString('id-ID');
+    
+    document.getElementById('btn-simpan-biaya').innerHTML = `<svg class="svg-icon"><use href="#icon-edit"></use></svg> Simpan Ulang (Revisi)`;
+    Swal.fire("Mode Revisi", "Peringatan: Kamu harus upload ulang foto/nota!", "info");
+}
+
+function hapusPendingLokal(idPending) {
+    Swal.fire({
+        title: 'Batal Kirim?', text: "Data akan dihapus sebelum sampai ke Server.", icon: 'warning',
+        showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!'
+    }).then((res) => {
+        if (res.isConfirmed) {
+            let pending = JSON.parse(localStorage.getItem('antrean_tunda')) || [];
+            pending = pending.filter(p => p.idPengeluaran !== idPending);
+            localStorage.setItem('antrean_tunda', JSON.stringify(pending));
+            renderRiwayat();
+            Swal.fire("Terhapus", "Nota dibatalkan & tidak dikirim ke server.", "success");
+        }
+    });
+}
+
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+</script>
+</body>
+</html>

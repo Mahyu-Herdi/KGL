@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll & Keuangan - CV Kembar Group</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+:root { 
+  --bg-dark: #121212; 
+  --card-bg: #1c1c1c; 
+  --accent-yellow: #facc15; 
+  --accent-green: #22c55e; 
+  --accent-blue: #3b82f6; 
+  --accent-red: #ef4444; 
+  --text-white: #ffffff; 
+  --text-gray: #a1a1aa; 
+  --shadow-dark: #0a0a0a; 
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+body { background: var(--bg-dark); color: var(--text-white); padding: 20px 15px; min-height: 100vh; }
+
+.svg-icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 6px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: inline-block; }
+.svg-icon-large { width: 28px; height: 28px; margin-right: 10px; }
+.icon-only { margin-right: 0; }
+
+.container { 
+    max-width: 1200px; width: 98%; margin: 0 auto; 
+    background: var(--card-bg); padding: 35px; border-radius: 30px; 
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+    border: none; min-height: 85vh;
+}
+
+.header { border-bottom: 2px dashed rgba(255,255,255,0.05); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap:wrap; gap:15px; }
+.header h1 { color: var(--accent-yellow); font-size: 24px; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+.btn-back { 
+    background: var(--card-bg); color: var(--text-gray); padding: 10px 18px; border-radius: 12px; cursor: pointer; text-decoration: none; font-size: 12px; font-weight: bold;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3); transition: 0.3s; display: flex; align-items: center; border: none;
+}
+.btn-back:hover { color: var(--text-white); box-shadow: inset 0 1px 2px rgba(0,0,0,0.4); }
+
+.tabs { display: flex; gap: 15px; margin-bottom: 30px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
+.tab-btn { 
+    flex: 1; min-width: 140px; padding: 14px 20px; border: none; background: var(--card-bg); color: var(--text-gray); 
+    border-radius: 16px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; transition: 0.3s; display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+}
+.tab-btn.active { 
+    background: var(--accent-blue); color: white; 
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); 
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.tab-content { display: none; animation: fadeIn 0.4s ease; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-form-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+@media(max-width: 768px) { .grid-form, .grid-form-3 { grid-template-columns: 1fr; gap: 15px; } }
+
+.form-group { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+label { font-size: 12px; color: var(--text-gray); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 5px; }
+input, select, datalist { 
+    width: 100%; padding: 16px; background: #151515; border: none; border-radius: 16px; color: var(--accent-yellow); font-size: 14px; outline: none; transition: 0.3s;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 2px 4px rgba(0,0,0,0.3);
+}
+input[type="date"] { color: #60a5fa; }
+input:focus, select:focus { box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 2px 4px rgba(0,0,0,0.3), 0 0 8px rgba(250, 204, 21, 0.3); }
+
+.info-box { 
+    background: linear-gradient(145deg, #181818, #1a1a1a); border-left: 4px solid var(--accent-blue); padding: 18px; border-radius: 16px; margin-bottom: 20px; font-size: 13px; line-height:1.6; 
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column;
+}
+
+.btn-submit { 
+    width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 14px; font-weight: bold; cursor: pointer; color: white; margin-top: 15px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+}
+.btn-submit:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); transform: translateY(2px); }
+
+.neraca-box { 
+    background: #181818; padding: 25px; border-radius: 20px; margin-bottom: 20px; 
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 2px 4px rgba(0,0,0,0.3);
+    border: none; overflow: hidden;
+}
+.neraca-box h3 { font-size: 26px; margin: 8px 0 0 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+
+.riwayat-card { 
+    background: #181818; padding: 18px; border-radius: 16px; margin-bottom: 15px; border: none; 
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1), inset 0 -1px 2px rgba(0, 0, 0, 0.3); transition: 0.3s;
+}
+.riwayat-card:hover { transform: translateY(-3px); box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.2), inset 0 -1px 3px rgba(0, 0, 0, 0.4); }
+
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+.modal-content { width: 100%; max-width: 900px; background: var(--card-bg); height: 85vh; border-radius: 24px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.8); border: 1px solid #333; padding: 5px; }
+.modal-close { position: absolute; top: -15px; right: -15px; background: var(--accent-red); color: white; width: 40px; height: 40px; border-radius: 50%; border: none; font-size: 20px; cursor: pointer; font-weight: bold; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), inset 0 -1px 2px rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center; }
+.modal iframe, .modal img { width: 100%; height: 100%; border-radius: 18px; border: none; object-fit: contain; background: #111; }
+div:where(.swal2-popup) { background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box, repeating-linear-gradient(-45deg, #000 0, #000 10px, var(--accent-yellow) 10px, var(--accent-yellow) 20px) border-box !important; border: 3px solid transparent !important; color: white !important; border-radius: 24px !important; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3) !important; }
+
+/* PC / TABLET ENHANCEMENTS: Neon Blur Animasi & Layout Semi Full-Screen */
+@media (min-width: 768px) {
+    body::before, body::after {
+        content: ""; position: fixed; width: 45vw; height: 45vw; border-radius: 50%;
+        filter: blur(120px); z-index: 0; animation: neon-float 20s infinite alternate ease-in-out; pointer-events: none;
+    }
+    body::before { background: rgba(250, 204, 21, 0.05); top: -15%; left: -15%; }
+    body::after { background: rgba(59, 130, 246, 0.05); bottom: -15%; right: -15%; animation-delay: -10s; }
+    
+    @keyframes neon-float {
+        0% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(15vw, 8vh) scale(1.1); }
+        100% { transform: translate(-5vw, 15vh) scale(0.9); }
+    }
+    .container { position: relative; z-index: 2; margin-top: 40px; }
+}
+@media (max-width: 767px) { .container { padding: 15px; border-radius: 20px; } .header h1 { font-size: 20px; } .neraca-box { padding: 15px; } .modal-content { max-width: 100%; height: 95vh; } }
+
+</style>
+</head>
+<body>
+
+<svg style="display: none;">
+  <symbol id="icon-money" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+  <symbol id="icon-card" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></symbol>
+  <symbol id="icon-document" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></symbol>
+  <symbol id="icon-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="icon-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="icon-back" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+  <symbol id="icon-fire" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+  <symbol id="icon-tool" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+</svg>
+
+<div class="container">
+  <div class="header">
+    <h1><svg class="svg-icon svg-icon-large"><use href="#icon-money"></use></svg> Pusat Payroll & Keuangan</h1>
+    <a href="/dashboard_admin.html" class="btn-back"><svg class="svg-icon"><use href="#icon-back"></use></svg> Kembali ke Dashboard</a>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="bukaTab('gaji', this)"><svg class="svg-icon"><use href="#icon-card"></use></svg> Gaji Pegawai</button>
+    <button class="tab-btn" onclick="bukaTab('kasbon', this)"><svg class="svg-icon"><use href="#icon-document"></use></svg> Form Kasbon</button>
+    <button class="tab-btn" onclick="bukaTab('riwayat', this)"><svg class="svg-icon"><use href="#icon-folder"></use></svg> Riwayat Mutasi</button>
+    <button class="tab-btn" style="background:var(--accent-blue); color:white;" onclick="bukaTab('neraca', this)"><svg class="svg-icon"><use href="#icon-chart"></use></svg> Neraca Kas</button>
+  </div>
+
+  <div id="tab-gaji" class="tab-content active">
+    
+    <div class="grid-form" style="margin-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">
+        <div class="form-group"><label>Filter Periode Kerja (Dari)</label><input type="date" id="gajiPeriodeMulai" onchange="isiOtomatisGaji()"></div>
+        <div class="form-group"><label>Filter Periode Kerja (Sampai)</label><input type="date" id="gajiPeriodeAkhir" onchange="isiOtomatisGaji()"></div>
+    </div>
+
+    <div class="form-group">
+      <label>Nama Pegawai (Ketik bebas/Pilih)</label>
+      <input list="listPegawai" id="gajiNama" placeholder="Cari nama (contoh: Adil)..." oninput="isiOtomatisGaji()">
+      <datalist id="listPegawai"></datalist>
+    </div>
+    
+    <div class="grid-form">
+      <div class="form-group"><label>Jabatan Lapangan</label><input type="text" id="gajiJabatan" placeholder="Cth: Operator Eksa"></div>
+      <div class="form-group"><label>No. Rekening Tujuan</label><input type="text" id="gajiRekening" placeholder="Cth: BSI 123456789"></div>
+    </div>
+    
+    <div class="info-box" id="infoAbsensi"><svg class="svg-icon"><use href="#icon-fire"></use></svg> Masukkan nama & set periode tanggal untuk melihat rekam jejak kerja.</div>
+    
+    <div class="grid-form">
+      <div class="form-group"><label>Gaji Pokok / Upah</label><input type="text" id="gajiPokok" oninput="formatRup(event); hitungBersih()" placeholder="Rp 0"></div>
+      <div class="form-group"><label>Bonus / Tunjangan Tambahan</label><input type="text" id="gajiBonus" oninput="formatRup(event); hitungBersih()" placeholder="Rp 0"></div>
+    </div>
+    
+    <div class="form-group">
+      <label style="color:var(--accent-red);">Potong Kasbon (Sisa Hutang: <span id="labelSisaKasbon">Rp 0</span>)</label>
+      <input type="text" id="gajiPotong" oninput="formatRup(event); hitungBersih()" placeholder="Ketik nominal yang mau dipotong bulan ini...">
+    </div>
+    
+    <div class="info-box" style="background: rgba(34, 197, 94, 0.1); border-left-color: var(--accent-green);">
+      <strong style="color:var(--text-white);">Total Terima Bersih:</strong> 
+      <div id="labelTerimaBersih" style="font-size: 28px; color: var(--accent-green); font-weight: bold; margin-top:8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Rp 0</div>
+    </div>
+    
+    <div class="grid-form">
+        <div class="form-group">
+          <label>Sumber Dana (Uang Gaji Diambil Dari?)</label>
+          <select id="gajiSumberDana">
+            <option value="Laba Bersih CV">Laba Bersih CV (Resmi)</option>
+            <option value="Dana Pribadi Direktur">Dana Pribadi Direktur</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Upload Bukti Transfer (Opsional)</label>
+          <input type="file" id="gajiBukti" accept="image/*" style="padding: 13px;">
+        </div>
+    </div>
+    <button class="btn-submit" style="background: var(--accent-green);" onclick="prosesGaji()"><svg class="svg-icon"><use href="#icon-card"></use></svg> Terbitkan Slip & Bayar Gaji</button>
+  </div>
+
+  <div id="tab-kasbon" class="tab-content">
+    <div class="form-group"><label>Nama Pegawai</label><input list="listPegawai" id="kasbonNama" placeholder="Cari nama..." onchange="isiOtomatisKasbon()"></div>
+    <div class="grid-form">
+        <div class="form-group"><label>Jabatan</label><input type="text" id="kasbonJabatan" placeholder="Cth: Kenet Tronton"></div>
+        <div class="form-group"><label>Nominal Pinjaman</label><input type="text" id="kasbonNominal" oninput="formatRup(event)" placeholder="Rp 0"></div>
+    </div>
+    <div class="form-group">
+      <label>Sumber Dana Kasbon (Keluar Dari Mana?)</label>
+      <select id="kasbonSumberDana">
+        <option value="Kas Operasional (Tunai)">Kas Operasional (Tunai)</option>
+        <option value="Rekening CV (Bank)">Rekening CV (Bank)</option>
+        <option value="Dana Pribadi Direktur">Dana Pribadi Direktur</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Keterangan / Alasan Kasbon</label><input type="text" id="kasbonKet" placeholder="Cth: Pinjaman keperluan keluarga..."></div>
+    <button class="btn-submit" style="background: var(--accent-yellow); color: black;" onclick="simpanKasbon()"><svg class="svg-icon"><use href="#icon-document"></use></svg> Simpan & Berikan Kasbon</button>
+  </div>
+
+  <div id="tab-riwayat" class="tab-content">
+    <div class="grid-form" style="margin-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">
+        <div class="form-group"><label>Filter Riwayat (Dari Tanggal)</label><input type="date" id="riwayatMulai" onchange="renderRiwayat(currentRiwayatTab)"></div>
+        <div class="form-group"><label>Filter Riwayat (Sampai Tanggal)</label><input type="date" id="riwayatAkhir" onchange="renderRiwayat(currentRiwayatTab)"></div>
+    </div>
+
+    <div style="display:flex; gap:15px; margin-bottom:20px;">
+        <button class="btn-submit" style="margin:0; background:var(--accent-blue);" onclick="renderRiwayat('gaji')"><svg class="svg-icon"><use href="#icon-card"></use></svg> Histori Gaji</button>
+        <button class="btn-submit" style="margin:0; background:var(--accent-red);" onclick="renderRiwayat('kasbon')"><svg class="svg-icon"><use href="#icon-document"></use></svg> Histori Kasbon</button>
+    </div>
+    <div id="containerRiwayat" style="max-height: 550px; overflow-y: auto; padding-right:10px; scrollbar-width: thin;"></div>
+  </div>
+
+  <div id="tab-neraca" class="tab-content">
+    <h2 style="color:var(--accent-yellow); margin-bottom:15px; text-transform: uppercase; letter-spacing: 1px;"><svg class="svg-icon"><use href="#icon-chart"></use></svg> Laporan Posisi Kas Terkini</h2>
+    
+    <div class="grid-form" style="margin-bottom: 25px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 15px;">
+        <div class="form-group"><label>Cek Neraca Dari Tanggal</label><input type="date" id="neracaMulai" onchange="hitungNeracaPintar()"></div>
+        <div class="form-group"><label>Sampai Tanggal</label><input type="date" id="neracaAkhir" onchange="hitungNeracaPintar()"></div>
+    </div>
+
+    <div class="grid-form-3">
+        <div class="neraca-box hijau">
+          <p style="margin:0 0 5px; color:var(--text-gray); font-size: 12px; font-weight: bold; text-transform: uppercase;">Laba Bersih Tersedia (CV)</p>
+          <h3 style="color:var(--accent-green);" id="lblNeracaLaba">Memuat...</h3>
+          <p style="font-size:11px; color:#555; margin-top:8px;">*Sisa keuntungan setelah potong operasional alat (di periode filter).</p>
+        </div>
+        <div class="neraca-box merah" style="border-left-color: var(--accent-yellow);">
+          <p style="margin:0 0 5px; color:var(--text-gray); font-size: 12px; font-weight: bold; text-transform: uppercase;">Pengeluaran Gaji & Kasbon</p>
+          <h3 style="color:var(--accent-yellow);" id="lblNeracaGajiKeluar">Memuat...</h3>
+          <p style="font-size:11px; color:#555; margin-top:8px;">*Uang riil yang sudah dikeluarkan untuk bayar Gaji Pegawai & Kasbon.</p>
+        </div>
+        <div class="neraca-box merah">
+          <p style="margin:0 0 5px; color:var(--text-gray); font-size: 12px; font-weight: bold; text-transform: uppercase;">Total Piutang Kasbon</p>
+          <h3 style="color:var(--accent-red);" id="lblNeracaPiutang">Memuat...</h3>
+          <p style="font-size:11px; color:#555; margin-top:8px;">*Total uang CV yang belum dipotong dari pegawai (Akumulasi keseluruhan).</p>
+        </div>
+    </div>
+    
+    <div class="grid-form" style="margin-top:20px;">
+        <div class="neraca-box biru" style="background: linear-gradient(145deg, #13243f, #1e3a8a); border: none; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);">
+          <p style="margin:0 0 5px; color:#93c5fd; font-size: 13px; font-weight: bold; text-transform: uppercase;">Saldo Kas & Bank Ril (Uang Fisik)</p>
+          <h3 style="color:white; font-size:30px; text-shadow: 2px 2px 5px rgba(0,0,0,0.5);" id="lblNeracaFisik">Memuat...</h3>
+          <p style="font-size:11px; color:#bfdbfe; margin-top:10px;">*Rumus: (Laba CV - Gaji Pegawai) - Piutang Kasbon.</p>
+        </div>
+        
+        <div class="neraca-box kuning" style="background: linear-gradient(145deg, #2a2016, #3f2e13); border: none; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);">
+          <p style="margin:0 0 5px; color:#fde047; font-size: 13px; font-weight: bold; text-transform: uppercase;">Total Nilai Aset (Investasi)</p>
+          <h3 style="color:var(--accent-yellow); font-size:30px; text-shadow: 2px 2px 5px rgba(0,0,0,0.5);" id="lblNeracaAset">Memuat...</h3>
+          <p style="font-size:11px; color:#fef08a; margin-top:10px;">*Akumulasi harga beli seluruh Eskavator & Tronton (Keseluruhan).</p>
+        </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="modalViewer" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="document.getElementById('modalViewer').style.display='none'">X</button>
+    <iframe id="iframeViewer" style="display:none;"></iframe>
+    <img id="imgViewer" style="display:none;">
+  </div>
+</div>
+
+<script>
+// PASTIKAN LINK INI SESUAI DENGAN DEPLOY TERBARU KAMU
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw6H0zUU7UzVg7iOXRbf5nOoL3qLr6gWVofMnxLVAGNzGRtLCxbKCmdbNdkFp36YN7ZNw/exec";
+
+let db = { pegawai:[], gaji:[], kasbon:[], sesi:[], pengeluaran:[], aset:[], contekan:{} };
+let currentRiwayatTab = 'gaji';
+
+if(localStorage.getItem("superadmin_auth") !== "valid") { window.location.href = '/dashboard_admin.html'; }
+
+window.onload = () => {
+  let now = new Date();
+  let firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  let strFirst = firstDay.toISOString().split('T')[0];
+  let strNow = now.toISOString().split('T')[0];
+  
+  // Set default form values ke tanggal awal bulan dan hari ini
+  document.getElementById('gajiPeriodeMulai').value = strFirst;
+  document.getElementById('gajiPeriodeAkhir').value = strNow;
+  document.getElementById('riwayatMulai').value = strFirst;
+  document.getElementById('riwayatAkhir').value = strNow;
+  document.getElementById('neracaMulai').value = strFirst;
+  document.getElementById('neracaAkhir').value = strNow;
+
+  Swal.fire({ title: 'Memuat Data Terpusat...', allowOutsideClick:false, didOpen: () => Swal.showLoading() });
+  fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'get_payroll_data' }) })
+  .then(r => r.json()).then(res => {
+    Swal.close();
+    if(res.status === 'success') {
+      db = res;
+      let listHTML = '';
+      db.pegawai.forEach(p => { listHTML += `<option value="${p['NAMA PEGAWAI']}">`; });
+      document.getElementById('listPegawai').innerHTML = listHTML;
+      hitungNeracaPintar();
+    }
+  });
+};
+
+function formatTanggalManusiawi(tgl) {
+  if(!tgl) return "-";
+  let d = new Date(tgl);
+  if(isNaN(d)) return tgl;
+  const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function bukaTab(tabId, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.background = 'var(--card-bg)';
+      b.style.color = 'var(--text-gray)';
+  });
+  
+  document.getElementById('tab-' + tabId).classList.add('active');
+  btn.classList.add('active');
+  btn.style.background = 'var(--accent-blue)';
+  btn.style.color = 'white';
+  
+  if(tabId === 'riwayat') renderRiwayat(currentRiwayatTab);
+  if(tabId === 'neraca') hitungNeracaPintar();
+}
+
+function parseN(n) { 
+  if (!n) return 0;
+  if (typeof n === 'number') return n;
+  let s = String(n).replace(/Rp/gi, '').trim();
+  if (s === '-' || s === '') return 0;
+  let isNegative = s.startsWith('-');
+  let digits = s.replace(/[^0-9]/g, '');
+  let result = parseFloat(digits) || 0;
+  return isNegative ? -result : result;
+}
+
+const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+
+function formatRup(e) {
+  let v = e.target.value.replace(/[^,\d]/g, '');
+  let sp = v.split(',');
+  let sisa = sp[0].length % 3;
+  let rp = sp[0].substr(0, sisa);
+  let rb = sp[0].substr(sisa).match(/\d{3}/gi);
+  if(rb) rp += (sisa ? '.' : '') + rb.join('.');
+  e.target.value = rp ? 'Rp ' + (sp[1] != undefined ? rp + ',' + sp[1] : rp) : '';
+}
+
+function hitungBersih() {
+  let g = parseN(document.getElementById('gajiPokok').value);
+  let b = parseN(document.getElementById('gajiBonus').value);
+  let p = parseN(document.getElementById('gajiPotong').value);
+  document.getElementById('labelTerimaBersih').innerText = formatRp((g + b) - p);
+}
+
+function parseTanggalAman(str) {
+  if(!str) return new Date("invalid");
+  let s = String(str).split(' ')[0];
+  if(s.includes('/')) {
+      let p = s.split('/');
+      return new Date(p[2], parseInt(p[1])-1, p[0]);
+  }
+  if(s.includes('-')) {
+      let p = s.split('-');
+      if(p[0].length === 4) return new Date(p[0], parseInt(p[1])-1, p[2]);
+      return new Date(p[2], parseInt(p[1])-1, p[0]);
+  }
+  return new Date(str);
+}
+
+function isiOtomatisGaji() {
+  const nm = document.getElementById('gajiNama').value.trim();
+  const tglMulai = document.getElementById('gajiPeriodeMulai').value;
+  const tglAkhir = document.getElementById('gajiPeriodeAkhir').value;
+
+  const p = db.pegawai.find(x => x['NAMA PEGAWAI'].toLowerCase() === nm.toLowerCase());
+  if(p) {
+    document.getElementById('gajiJabatan').value = p['JABATAN'];
+    document.getElementById('gajiRekening').value = p['REKENING'];
+    document.getElementById('labelSisaKasbon').innerText = formatRp(parseN(p['SISA KASBON']));
+  } else { document.getElementById('labelSisaKasbon').innerText = 'Rp 0'; }
+
+  const infoEl = document.getElementById('infoAbsensi');
+  if(!nm || !tglMulai || !tglAkhir) {
+    infoEl.innerHTML = `<svg class="svg-icon"><use href="#icon-fire"></use></svg> Masukkan nama & set periode tanggal untuk melihat rekam jejak kerja.`;
+    return;
+  }
+
+  let dMulai = new Date(tglMulai); dMulai.setHours(0,0,0,0);
+  let dAkhir = new Date(tglAkhir); dAkhir.setHours(23,59,59,999);
+
+  let totalTrip = 0, totalJam = 0, totalOmset = 0, totalPengeluaran = 0;
+  let idSesiPegawai = [];
+
+  db.sesi.forEach(s => {
+    let tglKerjaStr = s["TGL"] || s["tanggal"];
+    if(!tglKerjaStr) return;
+    
+    let dKerja = parseTanggalAman(tglKerjaStr);
+    let namaPtg = String(s["NAMA PETUGAS"] || "").toLowerCase();
+    
+    if (dKerja >= dMulai && dKerja <= dAkhir && namaPtg.includes(nm.toLowerCase())) {
+        let isTrn = String(s["ID ESK"]).startsWith("TRN") || String(s["ARMADA"]).toLowerCase().includes("tronton");
+        if (s["STATUS"] !== "Sedang Beroperasi") {
+            if (isTrn) totalTrip++;
+            else totalJam += parseFloat(String(s["TOTAL JAM"]).replace(',', '.')) || 0;
+            totalOmset += parseN(s["SUBTOTAL"]);
+            idSesiPegawai.push(s["ID ESK"] || s["id"]);
+        }
+    }
+  });
+
+  db.pengeluaran.forEach(peng => {
+    if (idSesiPegawai.includes(peng["ID PETUGAS"] || peng["ID SESI"])) {
+        totalPengeluaran += parseN(peng["ANGGARAN"] || peng["NOMINAL"] || peng["5"]);
+    }
+  });
+
+  if(totalTrip > 0 || totalJam > 0) {
+    infoEl.innerHTML = `
+        <div style="margin-bottom: 8px; color: var(--accent-yellow); font-size: 14px;"><svg class="svg-icon"><use href="#icon-chart"></use></svg> <b>Rekapitulasi: ${formatTanggalManusiawi(tglMulai)} s/d ${formatTanggalManusiawi(tglAkhir)}</b></div>
+        <ul style="margin-left: 20px; font-size: 13px; color: #bfdbfe; line-height: 1.6;">
+            <li>Hasil Kerja: ${totalTrip > 0 ? '<b>'+totalTrip+' Trip Tronton</b>' : ''} ${totalTrip>0 && totalJam>0 ? ' | ' : ''} ${totalJam > 0 ? '<b>'+Math.round(totalJam*10)/10 + ' Jam Eksa</b>' : ''}</li>
+            <li>Omset Dihasilkan: <span style="color:var(--accent-green);">${formatRp(totalOmset)}</span></li>
+            <li>Pengeluaran Alat/Sesi: <span style="color:var(--accent-red);">${formatRp(totalPengeluaran)}</span></li>
+            <li style="margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 5px; color: var(--text-white);">Laba Sesi Lapangan: <b>${formatRp(totalOmset - totalPengeluaran)}</b></li>
+        </ul>
+    `;
+  } else {
+    infoEl.innerHTML = `<svg class="svg-icon"><use href="#icon-fire"></use></svg> Belum ada rekam jejak kerja yang selesai untuk nama ini di periode tersebut.`;
+  }
+}
+
+function prosesGaji() {
+  const nama = document.getElementById('gajiNama').value.trim();
+  const fileInput = document.getElementById('gajiBukti');
+  if(!nama) return Swal.fire("Oops", "Nama wajib diisi!", "warning");
+
+  const periodeTeksFormat = formatTanggalManusiawi(document.getElementById('gajiPeriodeMulai').value) + " s/d " + formatTanggalManusiawi(document.getElementById('gajiPeriodeAkhir').value);
+
+  let kirimKeServer = (imgBase64) => {
+    const payload = {
+      action: "proses_gaji", nama: nama,
+      jabatan: document.getElementById('gajiJabatan').value.trim(),
+      rekening: document.getElementById('gajiRekening').value.trim(),
+      gajiPokok: parseN(document.getElementById('gajiPokok').value),
+      bonus: parseN(document.getElementById('gajiBonus').value),
+      potongan: parseN(document.getElementById('gajiPotong').value),
+      sumberDana: document.getElementById('gajiSumberDana').value,
+      periodeTeks: periodeTeksFormat,
+      buktiImage: imgBase64
+    };
+
+    Swal.fire({ title: 'Mencetak Slip...', didOpen: () => Swal.showLoading() });
+    fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) })
+    .then(r => r.json()).then(res => {
+      Swal.fire({
+        icon: 'success', title: 'Gaji Sukses Diproses!',
+        html: `<button class="btn-submit" style="background:var(--accent-yellow); color:black;" onclick="lihatFile('${res.urlSlip}', 'pdf')"><svg class="svg-icon"><use href="#icon-document"></use></svg> Buka Slip (PDF)</button><button class="btn-submit" style="background:#3b82f6; margin-top:10px;" onclick="location.reload()">Selesai</button>`,
+        showConfirmButton: false
+      });
+    });
+  };
+
+  if (fileInput.files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = (e) => kirimKeServer(e.target.result);
+    reader.readAsDataURL(fileInput.files[0]);
+  } else { kirimKeServer(null); }
+}
+
+function isiOtomatisKasbon() {
+  const nm = document.getElementById('kasbonNama').value;
+  const p = db.pegawai.find(x => x['NAMA PEGAWAI'].toLowerCase() === nm.toLowerCase());
+  if(p) document.getElementById('kasbonJabatan').value = p['JABATAN'];
+}
+
+function simpanKasbon() {
+  const payload = {
+    action: "simpan_kasbon",
+    nama: document.getElementById('kasbonNama').value.trim(),
+    jabatan: document.getElementById('kasbonJabatan').value.trim(),
+    nominal: parseN(document.getElementById('kasbonNominal').value),
+    sumberDana: document.getElementById('kasbonSumberDana').value,
+    keterangan: document.getElementById('kasbonKet').value.trim()
+  };
+  if(!payload.nama || payload.nominal <= 0) return Swal.fire("Oops", "Lengkapi form kasbon!", "warning");
+
+  Swal.fire({ title: 'Menyimpan Kasbon...', didOpen: () => Swal.showLoading() });
+  fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) })
+  .then(r => r.json()).then(res => Swal.fire("Berhasil!", res.message, "success").then(() => location.reload()));
+}
+
+function renderRiwayat(jenis) {
+  if (jenis) currentRiwayatTab = jenis;
+  
+  const t1 = parseTanggalAman(document.getElementById('riwayatMulai').value);
+  const t2 = parseTanggalAman(document.getElementById('riwayatAkhir').value);
+  t1.setHours(0,0,0,0); t2.setHours(23,59,59,999);
+
+  const ctn = document.getElementById('containerRiwayat');
+  ctn.innerHTML = '';
+  
+  if (currentRiwayatTab === 'gaji') {
+    let filteredData = db.gaji.filter(g => {
+        let d = parseTanggalAman(g["TANGGAL"]);
+        return d >= t1 && d <= t2;
+    });
+
+    if(filteredData.length === 0) return ctn.innerHTML = '<p style="color:var(--text-gray);">Belum ada riwayat gaji di rentang tanggal ini.</p>';
+    
+    [...filteredData].reverse().forEach(g => {
+      let ft = g["LINK SLIP PDF"];
+      ctn.innerHTML += `
+        <div class="riwayat-card">
+            <div style="display:flex; justify-content:space-between;"><span style="font-size:11px; color:var(--text-gray);">${g["TANGGAL"]}</span><strong style="color:var(--accent-green); font-size:15px;">Terima: ${formatRp(parseN(g["TERIMA BERSIH"]))}</strong></div>
+            <div style="font-size:15px; margin-top:5px; font-weight:bold;">${g["NAMA PEGAWAI"]} <span style="font-size:11px; color:#60a5fa; font-weight:normal; background: rgba(59, 130, 246, 0.15); padding: 2px 6px; border-radius: 6px;">${g["SUMBER DANA"]}</span></div>
+            <div style="font-size:12px; color:var(--text-gray); margin-top:8px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px;">Gaji+Bonus: ${formatRp(parseN(g["GAJI POKOK"])+parseN(g["BONUS"]))} | Potongan: <span style="color:var(--accent-red);">${formatRp(parseN(g["POTONGAN KASBON"]))}</span></div>
+            ${ft && ft !== "-" ? `<a href="#" onclick="lihatFile('${ft}', 'pdf')" style="display:inline-flex; align-items:center; margin-top:10px; font-size:12px; color:var(--accent-yellow); font-weight:bold; text-decoration:none;"><svg class="svg-icon icon-only" style="width:14px; margin-right:4px;"><use href="#icon-document"></use></svg> Lihat Slip PDF</a>` : ''}
+        </div>`;
+    });
+  } else {
+    let filteredData = db.kasbon.filter(k => {
+        let d = parseTanggalAman(k["TANGGAL"]);
+        return d >= t1 && d <= t2;
+    });
+
+    if(filteredData.length === 0) return ctn.innerHTML = '<p style="color:var(--text-gray);">Belum ada riwayat kasbon di rentang tanggal ini.</p>';
+    
+    [...filteredData].reverse().forEach(k => {
+      ctn.innerHTML += `
+        <div class="riwayat-card">
+            <div style="display:flex; justify-content:space-between;"><span style="font-size:11px; color:var(--text-gray);">${k["TANGGAL"]}</span><strong style="color:var(--accent-red); font-size:15px;">${formatRp(parseN(k["NOMINAL"]))}</strong></div>
+            <div style="font-size:15px; margin-top:5px; font-weight:bold;">${k["NAMA PEGAWAI"]}</div>
+            <div style="font-size:12px; color:var(--text-gray); margin-top:8px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px;">Sumber: ${k["SUMBER DANA"]} <br><span style="color:#60a5fa;">Keterangan: ${k["KETERANGAN"]}</span></div>
+        </div>`;
+    });
+  }
+}
+
+function bukaFilePopup(url, title = "Tinjau Dokumen") {
+  if (!url) return;
+  
+  let modal = document.getElementById('modalFileViewer');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modalFileViewer';
+    modal.style.cssText = `
+      position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000;
+      display: none; justify-content: center; align-items: center; padding: 20px;
+      backdrop-filter: blur(5px); transition: opacity 0.3s ease;
+    `;
+    
+    const container = document.createElement('div');
+    container.className = 'universal-modal-content';
+    container.style.cssText = `
+      width: 100%; max-width: 1000px; height: 85vh; background: #1c1c1c;
+      border-radius: 24px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      border: 1px solid #333; padding: 0; display: flex; flex-direction: column; overflow: hidden;
+    `;
+    
+    const header = document.createElement('div');
+    header.style.cssText = `
+      padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid #333; background: #181818;
+    `;
+    
+    const h3 = document.createElement('h3');
+    h3.id = 'modalFileTitle';
+    h3.style.cssText = `
+      margin: 0; color: #facc15; font-size: 16px; font-weight: bold; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI', system-ui, sans-serif;
+    `;
+    h3.innerHTML = `📁 <span id="modalTitleText">${title}</span>`;
+    
+    const actions = document.createElement('div');
+    actions.style.cssText = `display: flex; align-items: center; gap: 15px;`;
+    
+    const btnOriginal = document.createElement('a');
+    btnOriginal.id = 'btnModalOriginal';
+    btnOriginal.target = '_blank';
+    btnOriginal.style.cssText = `
+      color: #3b82f6; text-decoration: none; font-size: 12px; font-weight: bold;
+      background: rgba(59, 130, 246, 0.1); padding: 6px 12px; border-radius: 8px;
+      transition: 0.2s; display: flex; align-items: center; gap: 4px; font-family: sans-serif;
+    `;
+    btnOriginal.innerHTML = `↗️ Buka Tab Baru`;
+    
+    const btnClose = document.createElement('button');
+    btnClose.style.cssText = `
+      background: #8b1818; border: none; color: white; width: 32px; height: 32px;
+      border-radius: 50%; font-size: 18px; cursor: pointer; font-weight: bold;
+      display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    `;
+    btnClose.innerHTML = `×`;
+    btnClose.onclick = () => { modal.style.display = 'none'; };
+    btnClose.onmouseover = () => { btnClose.style.transform = 'scale(1.1)'; };
+    btnClose.onmouseout = () => { btnClose.style.transform = 'scale(1)'; };
+    
+    actions.appendChild(btnOriginal);
+    actions.appendChild(btnClose);
+    header.appendChild(h3);
+    header.appendChild(actions);
+    container.appendChild(header);
+    
+    const body = document.createElement('div');
+    body.style.cssText = `
+      flex: 1; display: flex; justify-content: center; align-items: center;
+      background: #111; padding: 10px; position: relative; overflow: hidden;
+    `;
+    
+    const ifr = document.createElement('iframe');
+    ifr.id = 'modalFileIframe';
+    ifr.style.cssText = `
+      width: 100%; height: 100%; border: none; border-radius: 12px; display: none; background: #111;
+    `;
+    
+    const img = document.createElement('img');
+    img.id = 'modalFileImg';
+    img.style.cssText = `
+      max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; display: none;
+    `;
+    
+    body.appendChild(ifr);
+    body.appendChild(img);
+    container.appendChild(body);
+    modal.appendChild(container);
+    document.body.appendChild(modal);
+    
+    const styleEl = document.createElement('style');
+    styleEl.innerHTML = `
+      @media (max-width: 767px) {
+        .universal-modal-content {
+          height: 95vh !important;
+          border-radius: 16px !important;
+        }
+        #modalFileTitle {
+          font-size: 14px !important;
+        }
+        #btnModalOriginal {
+          padding: 4px 8px !important;
+          font-size: 10px !important;
+        }
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+  
+  const ifr = document.getElementById('modalFileIframe');
+  const img = document.getElementById('modalFileImg');
+  const btnOriginal = document.getElementById('btnModalOriginal');
+  const titleText = document.getElementById('modalTitleText');
+  
+  titleText.innerText = title;
+  btnOriginal.href = url;
+  
+  const isImg = /\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i.test(url) || url.startsWith('data:image/');
+  
+  if (isImg) {
+    img.src = url;
+    img.style.display = 'block';
+    ifr.style.display = 'none';
+  } else {
+    let embedUrl = url;
+    if (url.includes("drive.google.com")) {
+      embedUrl = url.replace(/\/view(\?.*)?$/, "/preview");
+      embedUrl = embedUrl.replace(/\/view\/edit(\?.*)?$/, "/preview");
+      if (!embedUrl.includes("/preview")) {
+        embedUrl = embedUrl.replace("/view", "/preview");
+      }
+      if (embedUrl.includes("/open?id=")) {
+        const match = embedUrl.match(/id=([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+          embedUrl = "https://drive.google.com/file/d/" + match[1] + "/preview";
+        }
+      }
+    }
+    ifr.src = embedUrl;
+    ifr.style.display = 'block';
+    img.style.display = 'none';
+  }
+  
+  modal.style.display = 'flex';
+}
+
+function lihatFile(url, type) {
+  bukaFilePopup(url, type === 'pdf' ? 'Slip PDF' : 'Tinjau Dokumen');
+}
+
+function hitungNeracaPintar() {
+  const t1 = parseTanggalAman(document.getElementById('neracaMulai').value);
+  const t2 = parseTanggalAman(document.getElementById('neracaAkhir').value);
+  t1.setHours(0,0,0,0); t2.setHours(23,59,59,999);
+
+  let totalKotor = 0;
+  db.sesi.forEach(s => { 
+      let d = parseTanggalAman(s["TGL"] || s["tanggal"]);
+      if(s["STATUS"] !== "Sedang Beroperasi" && d >= t1 && d <= t2) {
+          totalKotor += parseN(s["SUBTOTAL"]); 
+      }
+  });
+
+  let totalPengeluaranAlat = 0;
+  db.pengeluaran.forEach(p => { 
+      let d = parseTanggalAman(p["TGL"] || p["TANGGAL"]);
+      if(d >= t1 && d <= t2) {
+          totalPengeluaranAlat += parseN(p["ANGGARAN"] || p["NOMINAL"] || p["5"] || p["URAIAN OP"] || 0); 
+      }
+  });
+
+  let totalGajiKeluar = 0;
+  db.gaji.forEach(g => { 
+      let d = parseTanggalAman(g["TANGGAL"]);
+      if(d >= t1 && d <= t2) {
+          totalGajiKeluar += (parseN(g["GAJI POKOK"]) + parseN(g["BONUS"])); 
+      }
+  });
+
+  let labaBersihReal = totalKotor - totalPengeluaranAlat;
+  
+  let totalPiutangKasbon = 0;
+  // Piutang itu akumulasi hutang pegawai ke perusahaan, gak terpengaruh filter tanggal (harus total berjalan saat ini)
+  db.pegawai.forEach(p => { 
+      totalPiutangKasbon += parseN(p["SISA KASBON"]); 
+  });
+
+  // Saldo fisik: Uang Laba (dalam rentang waktu) - Uang yang dikasih ke gaji - Semua uang yang masih dipegang pegawai (kasbon)
+  let kasRiil = labaBersihReal - totalGajiKeluar - totalPiutangKasbon;
+  
+  let totalAset = 0;
+  // Aset investasi juga nilai akumulasi (tidak terpengaruh tanggal mutasi bulan ini)
+  if(db.aset) {
+      db.aset.forEach(a => { totalAset += parseN(a["HARGA BELI"]); });
+  }
+
+  document.getElementById('lblNeracaLaba').innerText = formatRp(labaBersihReal);
+  document.getElementById('lblNeracaGajiKeluar').innerText = formatRp(totalGajiKeluar);
+  document.getElementById('lblNeracaPiutang').innerText = formatRp(totalPiutangKasbon);
+  document.getElementById('lblNeracaFisik').innerText = formatRp(kasRiil);
+  document.getElementById('lblNeracaAset').innerText = formatRp(totalAset);
+}
+</script>
+</body>
+</html>
