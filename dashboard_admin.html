@@ -1187,6 +1187,9 @@ function cetakLaporanPajak(jenisLaporan) {
       if (typeof dataSesiAktifUntukNota !== 'undefined' && dataSesiAktifUntukNota) {
         dataSesiAktifUntukNota.forEach(row => {
             if (row && (row["STATUS"] || "Selesai") !== 'Sedang Beroperasi') {
+                const jk = row["JENIS KLIEN"] || "Perorangan";
+                if (jk !== "Pemerintah") return; // Hanya hitung dan tampilkan proyek pemerintah
+                
                 const sub = parseNominalAman(row["SUBTOTAL"]);
                 totalOmzetBulanan += sub;
                 const op = row["NAMA PETUGAS"] || row["petugas"] || "-";
@@ -1209,6 +1212,11 @@ function cetakLaporanPajak(jenisLaporan) {
       if (typeof dataPengeluaranAktifUntukNota !== 'undefined' && dataPengeluaranAktifUntukNota) {
         dataPengeluaranAktifUntukNota.forEach(e => {
             if (e) {
+                const idS = e["ID PETUGAS"] || e["ID SESI"] || e[1];
+                const sesi = rawDataSesi.find(r => r && (r["ID ESK"] || r["id"]) === idS);
+                const jk = sesi ? (sesi["JENIS KLIEN"] || "Perorangan") : "Perorangan";
+                if (jk !== "Pemerintah") return; // Hanya tampilkan dan hitung pengeluaran dari proyek pemerintah
+
                 let k = (e["URAIAN OP"] || e["JENIS"] || "").toLowerCase(); 
                 let ket = (e["KETERANGAN"] || "").toLowerCase();
                 if(k.includes("bbm") || k.includes("solar") || k.includes("servis") || k.includes("sparepart") || k.includes("ban") || ket.includes("bbm") || ket.includes("sparepart")) {
@@ -1307,11 +1315,14 @@ function cetakLaporanPajak(jenisLaporan) {
         if (typeof rawDataSesi !== 'undefined' && rawDataSesi) {
           rawDataSesi.forEach(row => {
             if (row) {
+              const jk = row["JENIS KLIEN"] || "Perorangan";
+              if (jk !== "Pemerintah") return; // Hanya hitung proyek pemerintah
+
               const tR = parseTanggal(row["TGL"] || row["tanggal"]);
               if (tR && tR.getMonth() === m && tR.getFullYear() === tahunIni && (row["STATUS"] || "Selesai") !== 'Sedang Beroperasi') {
                 const sub = parseNominalAman(row["SUBTOTAL"]);
                 totalOmzetM += sub;
-                if ((row["JENIS KLIEN"] || "Perorangan") === "Pemerintah") totalOmzetPemerintahM += sub;
+                totalOmzetPemerintahM += sub;
               }
             }
           });
@@ -1320,6 +1331,11 @@ function cetakLaporanPajak(jenisLaporan) {
         if (typeof rawDataPengeluaran !== 'undefined' && rawDataPengeluaran) {
           rawDataPengeluaran.forEach(e => {
             if (e) {
+              const idS = e["ID PETUGAS"] || e["ID SESI"] || e[1];
+              const sesi = rawDataSesi.find(r => r && (r["ID ESK"] || r["id"]) === idS);
+              const jk = sesi ? (sesi["JENIS KLIEN"] || "Perorangan") : "Perorangan";
+              if (jk !== "Pemerintah") return; // Abaikan pengeluaran perorangan
+
               const tE = parseTanggal(e["TGL"] || e["TANGGAL"] || e[2]);
               if (tE && tE.getMonth() === m && tE.getFullYear() === tahunIni) {
                 totalBiayaM += parseNominalAman(e["ANGGARAN"] || e["NOMINAL"] || e[5] || 0);
@@ -1392,10 +1408,26 @@ function cetakLaporanPajak(jenisLaporan) {
 
       let omzetAll = 0, biayaAll = 0;
       if (typeof rawDataSesi !== 'undefined' && rawDataSesi) {
-        rawDataSesi.forEach(r => { if(r && (r["STATUS"]||"Selesai") !== 'Sedang Beroperasi') omzetAll += parseNominalAman(r["SUBTOTAL"]); });
+        rawDataSesi.forEach(r => { 
+          if(r && (r["STATUS"]||"Selesai") !== 'Sedang Beroperasi') {
+            const jk = r["JENIS KLIEN"] || "Perorangan";
+            if (jk === "Pemerintah") {
+              omzetAll += parseNominalAman(r["SUBTOTAL"]); 
+            }
+          }
+        });
       }
       if (typeof rawDataPengeluaran !== 'undefined' && rawDataPengeluaran) {
-        rawDataPengeluaran.forEach(e => { if(e) biayaAll += parseNominalAman(e["ANGGARAN"]||e["NOMINAL"]||e[5]||0); });
+        rawDataPengeluaran.forEach(e => { 
+          if(e) {
+            const idS = e["ID PETUGAS"] || e["ID SESI"] || e[1];
+            const sesi = rawDataSesi.find(r => r && (r["ID ESK"] || r["id"]) === idS);
+            const jk = sesi ? (sesi["JENIS KLIEN"] || "Perorangan") : "Perorangan";
+            if (jk === "Pemerintah") {
+              biayaAll += parseNominalAman(e["ANGGARAN"]||e["NOMINAL"]||e[5]||0); 
+            }
+          }
+        });
       }
       let labaRiilKeseluruhan = omzetAll - biayaAll;
       
