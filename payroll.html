@@ -18,24 +18,28 @@
   --shadow-dark: #0a0a0a; 
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-body { background: var(--bg-dark); color: var(--text-white); padding: 20px 15px; min-height: 100vh; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; }
+body { background: var(--bg-dark); color: var(--text-white); padding: 15px; min-height: 100vh; box-sizing: border-box; position: relative; }
+
+@media (min-width: 768px) {
+  body { padding: 30px 40px; }
+}
 
 .svg-icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 6px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: inline-block; }
 .svg-icon-large { width: 28px; height: 28px; margin-right: 10px; }
 .icon-only { margin-right: 0; }
 
 .container { 
-    max-width: 1200px; width: 98%; margin: 0 auto; 
+    max-width: 1300px; width: 100%; margin: 0 auto; 
     background: var(--card-bg); padding: 35px; border-radius: 30px; 
     box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
-    border: none; min-height: 85vh;
+    border: none; min-height: 85vh; box-sizing: border-box;
 }
 
-.header { border-bottom: 2px dashed rgba(255,255,255,0.05); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap:wrap; gap:15px; }
+.header { border-bottom: 2px dashed rgba(255,255,255,0.05); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
 .header h1 { color: var(--accent-yellow); font-size: 24px; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
 .btn-back { 
-    background: var(--card-bg); color: var(--text-gray); padding: 10px 18px; border-radius: 12px; cursor: pointer; text-decoration: none; font-size: 12px; font-weight: bold;
+    background: var(--card-bg); color: var(--text-gray); padding: 12px 20px; border-radius: 12px; cursor: pointer; text-decoration: none; font-size: 12px; font-weight: bold;
     box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3); transition: 0.3s; display: flex; align-items: center; border: none;
 }
 .btn-back:hover { color: var(--text-white); box-shadow: inset 0 1px 2px rgba(0,0,0,0.4); }
@@ -52,26 +56,87 @@ body { background: var(--bg-dark); color: var(--text-white); padding: 20px 15px;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
+@media (min-width: 768px) {
+  .tabs {
+    overflow: visible;
+    justify-content: space-between;
+  }
+  .tab-btn {
+    flex: 1;
+  }
+}
+
 .tab-content { display: none; animation: fadeIn 0.4s ease; }
 .tab-content.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* MODERN SPLIT LAYOUT */
+.split-layout-2 {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 30px;
+    align-items: start;
+}
+.split-layout-riwayat {
+    display: grid;
+    grid-template-columns: 0.7fr 1.3fr;
+    gap: 30px;
+    align-items: start;
+}
+.split-panel {
+    background: #181818;
+    padding: 25px;
+    border-radius: 24px;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05), inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+    border: 1px solid #252525;
+}
+.panel-title {
+    color: var(--accent-yellow);
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #2d2d2d;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.centered-container-650 {
+    max-width: 650px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+@media (max-width: 991px) {
+    .split-layout-2, .split-layout-riwayat {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
 
 .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .grid-form-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 @media(max-width: 768px) { .grid-form, .grid-form-3 { grid-template-columns: 1fr; gap: 15px; } }
 
 .form-group { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
-label { font-size: 12px; color: var(--text-gray); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 5px; }
+label { font-size: 11px; color: var(--text-gray); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 5px; }
 input, select, datalist { 
     width: 100%; padding: 16px; background: #151515; border: none; border-radius: 16px; color: var(--accent-yellow); font-size: 14px; outline: none; transition: 0.3s;
     box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 2px 4px rgba(0,0,0,0.3);
+    box-sizing: border-box;
 }
 input[type="date"] { color: #60a5fa; }
+input[type="file"] { padding: 13px 16px; color: var(--text-gray); cursor: pointer; }
 input:focus, select:focus { box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 2px 4px rgba(0,0,0,0.3), 0 0 8px rgba(250, 204, 21, 0.3); }
 
 .info-box { 
-    background: linear-gradient(145deg, #181818, #1a1a1a); border-left: 4px solid var(--accent-blue); padding: 18px; border-radius: 16px; margin-bottom: 20px; font-size: 13px; line-height:1.6; 
+    background: linear-gradient(145deg, #1d1d1d, #1a1a1a); border-left: 4px solid var(--accent-blue); padding: 18px; border-radius: 16px; margin-bottom: 20px; font-size: 13px; line-height:1.6; 
     box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column;
+}
+.info-box.accent-box-green {
+    background: rgba(34, 197, 94, 0.1); border-left-color: var(--accent-green);
 }
 
 .btn-submit { 
@@ -81,14 +146,18 @@ input:focus, select:focus { box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), 
 .btn-submit:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); transform: translateY(2px); }
 
 .neraca-box { 
-    background: #181818; padding: 25px; border-radius: 20px; margin-bottom: 20px; 
-    box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 2px 4px rgba(0,0,0,0.3);
-    border: none; overflow: hidden;
+    background: #1e1e1e; padding: 25px; border-radius: 24px; margin-bottom: 20px; 
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+    border-left: 5px solid var(--accent-blue); position: relative; overflow: hidden;
 }
 .neraca-box h3 { font-size: 26px; margin: 8px 0 0 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+.neraca-box.hijau { border-left-color: var(--accent-green); background: linear-gradient(145deg, #13241b, #181818); }
+.neraca-box.merah { border-left-color: var(--accent-red); background: linear-gradient(145deg, #2b1414, #181818); }
+.neraca-box.kuning { border-left-color: var(--accent-yellow); background: linear-gradient(145deg, #2a2016, #181818); }
+.neraca-box.biru { border-left-color: var(--accent-blue); background: linear-gradient(145deg, #13243f, #181818); }
 
 .riwayat-card { 
-    background: #181818; padding: 18px; border-radius: 16px; margin-bottom: 15px; border: none; 
+    background: #1e1e1e; padding: 18px; border-radius: 16px; margin-bottom: 15px; border: 1px solid #282828; 
     box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1), inset 0 -1px 2px rgba(0, 0, 0, 0.3); transition: 0.3s;
 }
 .riwayat-card:hover { transform: translateY(-3px); box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.2), inset 0 -1px 3px rgba(0, 0, 0, 0.4); }
@@ -113,10 +182,9 @@ div:where(.swal2-popup) { background: linear-gradient(var(--card-bg), var(--card
         50% { transform: translate(15vw, 8vh) scale(1.1); }
         100% { transform: translate(-5vw, 15vh) scale(0.9); }
     }
-    .container { position: relative; z-index: 2; margin-top: 40px; }
+    .container { position: relative; z-index: 2; margin-top: 20px; }
 }
 @media (max-width: 767px) { .container { padding: 15px; border-radius: 20px; } .header h1 { font-size: 20px; } .neraca-box { padding: 15px; } .modal-content { max-width: 100%; height: 95vh; } }
-
 </style>
 </head>
 <body>
@@ -146,121 +214,148 @@ div:where(.swal2-popup) { background: linear-gradient(var(--card-bg), var(--card
   </div>
 
   <div id="tab-gaji" class="tab-content active">
-    
-    <div class="grid-form" style="margin-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">
-        <div class="form-group"><label>Filter Periode Kerja (Dari)</label><input type="date" id="gajiPeriodeMulai" onchange="isiOtomatisGaji()"></div>
-        <div class="form-group"><label>Filter Periode Kerja (Sampai)</label><input type="date" id="gajiPeriodeAkhir" onchange="isiOtomatisGaji()"></div>
-    </div>
+    <div class="split-layout-2">
+      <!-- PANEL KIRI (Data Pegawai & Absensi) -->
+      <div class="split-panel">
+        <h2 class="panel-title"><svg class="svg-icon"><use href="#icon-folder"></use></svg> Informasi Pegawai & Periode Kerja</h2>
+        
+        <div class="grid-form" style="margin-bottom: 20px;">
+            <div class="form-group"><label>Filter Periode Kerja (Dari)</label><input type="date" id="gajiPeriodeMulai" onchange="isiOtomatisGaji()"></div>
+            <div class="form-group"><label>Filter Periode Kerja (Sampai)</label><input type="date" id="gajiPeriodeAkhir" onchange="isiOtomatisGaji()"></div>
+        </div>
 
-    <div class="form-group">
-      <label>Nama Pegawai (Ketik bebas/Pilih)</label>
-      <input list="listPegawai" id="gajiNama" placeholder="Cari nama (contoh: Adil)..." oninput="isiOtomatisGaji()">
-      <datalist id="listPegawai"></datalist>
-    </div>
-    
-    <div class="grid-form">
-      <div class="form-group"><label>Jabatan Lapangan</label><input type="text" id="gajiJabatan" placeholder="Cth: Operator Eksa"></div>
-      <div class="form-group"><label>No. Rekening Tujuan</label><input type="text" id="gajiRekening" placeholder="Cth: BSI 123456789"></div>
-    </div>
-    
-    <div class="info-box" id="infoAbsensi"><svg class="svg-icon"><use href="#icon-fire"></use></svg> Masukkan nama & set periode tanggal untuk melihat rekam jejak kerja.</div>
-    
-    <div class="grid-form">
-      <div class="form-group"><label>Gaji Pokok / Upah</label><input type="text" id="gajiPokok" oninput="formatRup(event); hitungBersih()" placeholder="Rp 0"></div>
-      <div class="form-group"><label>Bonus / Tunjangan Tambahan</label><input type="text" id="gajiBonus" oninput="formatRup(event); hitungBersih()" placeholder="Rp 0"></div>
-    </div>
-    
-    <div class="form-group">
-      <label style="color:var(--accent-red);">Potong Kasbon (Sisa Hutang: <span id="labelSisaKasbon">Rp 0</span>)</label>
-      <input type="text" id="gajiPotong" oninput="formatRup(event); hitungBersih()" placeholder="Ketik nominal yang mau dipotong bulan ini...">
-    </div>
-    
-    <div class="info-box" style="background: rgba(34, 197, 94, 0.1); border-left-color: var(--accent-green);">
-      <strong style="color:var(--text-white);">Total Terima Bersih:</strong> 
-      <div id="labelTerimaBersih" style="font-size: 28px; color: var(--accent-green); font-weight: bold; margin-top:8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Rp 0</div>
-    </div>
-    
-    <div class="grid-form">
         <div class="form-group">
-          <label>Sumber Dana (Uang Gaji Diambil Dari?)</label>
-          <select id="gajiSumberDana">
-            <option value="Laba Bersih CV">Laba Bersih CV (Resmi)</option>
-            <option value="Dana Pribadi Direktur">Dana Pribadi Direktur</option>
-          </select>
+          <label>Nama Pegawai (Ketik bebas/Pilih)</label>
+          <input list="listPegawai" id="gajiNama" placeholder="Cari nama (contoh: Adil)..." oninput="isiOtomatisGaji()">
+          <datalist id="listPegawai"></datalist>
         </div>
+        
+        <div class="grid-form">
+          <div class="form-group"><label>Jabatan Lapangan</label><input type="text" id="gajiJabatan" placeholder="Cth: Operator Eksa"></div>
+          <div class="form-group"><label>No. Rekening Tujuan</label><input type="text" id="gajiRekening" placeholder="Cth: BSI 123456789"></div>
+        </div>
+        
+        <div class="info-box" id="infoAbsensi"><svg class="svg-icon"><use href="#icon-fire"></use></svg> Masukkan nama & set periode tanggal untuk melihat rekam jejak kerja.</div>
+      </div>
+      
+      <!-- PANEL KANAN (Rincian Keuangan & Penggajian) -->
+      <div class="split-panel">
+        <h2 class="panel-title"><svg class="svg-icon"><use href="#icon-money"></use></svg> Detail Pembayaran & Gaji</h2>
+        
+        <div class="grid-form">
+          <div class="form-group"><label>Gaji Pokok / Upah</label><input type="text" id="gajiPokok" oninput="formatRup(event); hitungBersih()" placeholder="Rp 0"></div>
+          <div class="form-group"><label>Bonus / Tunjangan Tambahan</label><input type="text" id="gajiBonus" oninput="formatRup(event); hitungBersih()" placeholder="Rp 0"></div>
+        </div>
+        
         <div class="form-group">
-          <label>Upload Bukti Transfer (Opsional)</label>
-          <input type="file" id="gajiBukti" accept="image/*" style="padding: 13px;">
+          <label style="color:var(--accent-red);">Potong Kasbon (Sisa Hutang: <span id="labelSisaKasbon">Rp 0</span>)</label>
+          <input type="text" id="gajiPotong" oninput="formatRup(event); hitungBersih()" placeholder="Ketik nominal yang mau dipotong bulan ini...">
         </div>
+        
+        <div class="info-box accent-box-green">
+          <strong style="color:var(--text-white);">Total Terima Bersih:</strong> 
+          <div id="labelTerimaBersih" style="font-size: 28px; color: var(--accent-green); font-weight: bold; margin-top:8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Rp 0</div>
+        </div>
+        
+        <div class="grid-form">
+            <div class="form-group">
+              <label>Sumber Dana</label>
+              <select id="gajiSumberDana">
+                <option value="Laba Bersih CV">Laba Bersih CV (Resmi)</option>
+                <option value="Dana Pribadi Direktur">Dana Pribadi Direktur</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Upload Bukti Transfer (Opsional)</label>
+              <input type="file" id="gajiBukti" accept="image/*">
+            </div>
+        </div>
+        <button class="btn-submit" style="background: var(--accent-green);" onclick="prosesGaji()"><svg class="svg-icon"><use href="#icon-card"></use></svg> Terbitkan Slip & Bayar Gaji</button>
+      </div>
     </div>
-    <button class="btn-submit" style="background: var(--accent-green);" onclick="prosesGaji()"><svg class="svg-icon"><use href="#icon-card"></use></svg> Terbitkan Slip & Bayar Gaji</button>
   </div>
 
   <div id="tab-kasbon" class="tab-content">
-    <div class="form-group"><label>Nama Pegawai</label><input list="listPegawai" id="kasbonNama" placeholder="Cari nama..." onchange="isiOtomatisKasbon()"></div>
-    <div class="grid-form">
-        <div class="form-group"><label>Jabatan</label><input type="text" id="kasbonJabatan" placeholder="Cth: Kenet Tronton"></div>
-        <div class="form-group"><label>Nominal Pinjaman</label><input type="text" id="kasbonNominal" oninput="formatRup(event)" placeholder="Rp 0"></div>
+    <div class="centered-container-650">
+      <div class="split-panel">
+        <h2 class="panel-title"><svg class="svg-icon"><use href="#icon-document"></use></svg> Form Kasbon Baru</h2>
+        
+        <div class="form-group"><label>Nama Pegawai</label><input list="listPegawai" id="kasbonNama" placeholder="Cari nama..." onchange="isiOtomatisKasbon()"></div>
+        <div class="grid-form">
+            <div class="form-group"><label>Jabatan</label><input type="text" id="kasbonJabatan" placeholder="Cth: Kenet Tronton"></div>
+            <div class="form-group"><label>Nominal Pinjaman</label><input type="text" id="kasbonNominal" oninput="formatRup(event)" placeholder="Rp 0"></div>
+        </div>
+        <div class="form-group">
+          <label>Sumber Dana Kasbon (Keluar Dari Mana?)</label>
+          <select id="kasbonSumberDana">
+            <option value="Kas Operasional (Tunai)">Kas Operasional (Tunai)</option>
+            <option value="Rekening CV (Bank)">Rekening CV (Bank)</option>
+            <option value="Dana Pribadi Direktur">Dana Pribadi Direktur</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Keterangan / Alasan Kasbon</label><input type="text" id="kasbonKet" placeholder="Cth: Pinjaman keperluan keluarga..."></div>
+        <button class="btn-submit" style="background: var(--accent-yellow); color: black;" onclick="simpanKasbon()"><svg class="svg-icon"><use href="#icon-document"></use></svg> Simpan & Berikan Kasbon</button>
+      </div>
     </div>
-    <div class="form-group">
-      <label>Sumber Dana Kasbon (Keluar Dari Mana?)</label>
-      <select id="kasbonSumberDana">
-        <option value="Kas Operasional (Tunai)">Kas Operasional (Tunai)</option>
-        <option value="Rekening CV (Bank)">Rekening CV (Bank)</option>
-        <option value="Dana Pribadi Direktur">Dana Pribadi Direktur</option>
-      </select>
-    </div>
-    <div class="form-group"><label>Keterangan / Alasan Kasbon</label><input type="text" id="kasbonKet" placeholder="Cth: Pinjaman keperluan keluarga..."></div>
-    <button class="btn-submit" style="background: var(--accent-yellow); color: black;" onclick="simpanKasbon()"><svg class="svg-icon"><use href="#icon-document"></use></svg> Simpan & Berikan Kasbon</button>
   </div>
 
   <div id="tab-riwayat" class="tab-content">
-    <div class="grid-form" style="margin-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px;">
-        <div class="form-group"><label>Filter Riwayat (Dari Tanggal)</label><input type="date" id="riwayatMulai" onchange="renderRiwayat(currentRiwayatTab)"></div>
-        <div class="form-group"><label>Filter Riwayat (Sampai Tanggal)</label><input type="date" id="riwayatAkhir" onchange="renderRiwayat(currentRiwayatTab)"></div>
+    <div class="split-layout-riwayat">
+      <!-- PANEL FILTER KIRI -->
+      <div class="split-panel">
+        <h2 class="panel-title"><svg class="svg-icon"><use href="#icon-chart"></use></svg> Filter Mutasi</h2>
+        <div class="form-group"><label>Dari Tanggal</label><input type="date" id="riwayatMulai" onchange="renderRiwayat(currentRiwayatTab)"></div>
+        <div class="form-group"><label>Sampai Tanggal</label><input type="date" id="riwayatAkhir" onchange="renderRiwayat(currentRiwayatTab)"></div>
+        
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
+            <button class="btn-submit" style="margin:0; background:var(--accent-blue);" onclick="renderRiwayat('gaji')"><svg class="svg-icon"><use href="#icon-card"></use></svg> Histori Gaji</button>
+            <button class="btn-submit" style="margin:0; background:var(--accent-red);" onclick="renderRiwayat('kasbon')"><svg class="svg-icon"><use href="#icon-document"></use></svg> Histori Kasbon</button>
+        </div>
+      </div>
+      
+      <!-- PANEL DATA KANAN -->
+      <div class="split-panel">
+        <h2 class="panel-title"><svg class="svg-icon"><use href="#icon-folder"></use></svg> <span id="riwayatTitleText">Daftar Mutasi Gaji</span></h2>
+        <div id="containerRiwayat" style="max-height: 550px; overflow-y: auto; padding-right:10px; scrollbar-width: thin;"></div>
+      </div>
     </div>
-
-    <div style="display:flex; gap:15px; margin-bottom:20px;">
-        <button class="btn-submit" style="margin:0; background:var(--accent-blue);" onclick="renderRiwayat('gaji')"><svg class="svg-icon"><use href="#icon-card"></use></svg> Histori Gaji</button>
-        <button class="btn-submit" style="margin:0; background:var(--accent-red);" onclick="renderRiwayat('kasbon')"><svg class="svg-icon"><use href="#icon-document"></use></svg> Histori Kasbon</button>
-    </div>
-    <div id="containerRiwayat" style="max-height: 550px; overflow-y: auto; padding-right:10px; scrollbar-width: thin;"></div>
   </div>
 
   <div id="tab-neraca" class="tab-content">
-    <h2 style="color:var(--accent-yellow); margin-bottom:15px; text-transform: uppercase; letter-spacing: 1px;"><svg class="svg-icon"><use href="#icon-chart"></use></svg> Laporan Posisi Kas Terkini</h2>
-    
-    <div class="grid-form" style="margin-bottom: 25px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 15px;">
-        <div class="form-group"><label>Cek Neraca Dari Tanggal</label><input type="date" id="neracaMulai" onchange="hitungNeracaPintar()"></div>
-        <div class="form-group"><label>Sampai Tanggal</label><input type="date" id="neracaAkhir" onchange="hitungNeracaPintar()"></div>
+    <div class="split-panel" style="margin-bottom: 25px;">
+      <h2 class="panel-title" style="margin-bottom: 10px; border-bottom: none;"><svg class="svg-icon"><use href="#icon-chart"></use></svg> Laporan Posisi Kas Terkini</h2>
+      <div class="grid-form">
+          <div class="form-group"><label>Cek Neraca Dari Tanggal</label><input type="date" id="neracaMulai" onchange="hitungNeracaPintar()"></div>
+          <div class="form-group"><label>Sampai Tanggal</label><input type="date" id="neracaAkhir" onchange="hitungNeracaPintar()"></div>
+      </div>
     </div>
 
     <div class="grid-form-3">
         <div class="neraca-box hijau">
-          <p style="margin:0 0 5px; color:var(--text-gray); font-size: 12px; font-weight: bold; text-transform: uppercase;">Laba Bersih Tersedia (CV)</p>
+          <p style="margin:0 0 5px; color:var(--text-gray); font-size: 11px; font-weight: bold; text-transform: uppercase;">Laba Bersih Tersedia (CV)</p>
           <h3 style="color:var(--accent-green);" id="lblNeracaLaba">Memuat...</h3>
           <p style="font-size:11px; color:#555; margin-top:8px;">*Sisa keuntungan setelah potong operasional alat (di periode filter).</p>
         </div>
-        <div class="neraca-box merah" style="border-left-color: var(--accent-yellow);">
-          <p style="margin:0 0 5px; color:var(--text-gray); font-size: 12px; font-weight: bold; text-transform: uppercase;">Pengeluaran Gaji & Kasbon</p>
+        <div class="neraca-box kuning">
+          <p style="margin:0 0 5px; color:var(--text-gray); font-size: 11px; font-weight: bold; text-transform: uppercase;">Pengeluaran Gaji & Kasbon</p>
           <h3 style="color:var(--accent-yellow);" id="lblNeracaGajiKeluar">Memuat...</h3>
           <p style="font-size:11px; color:#555; margin-top:8px;">*Uang riil yang sudah dikeluarkan untuk bayar Gaji Pegawai & Kasbon.</p>
         </div>
         <div class="neraca-box merah">
-          <p style="margin:0 0 5px; color:var(--text-gray); font-size: 12px; font-weight: bold; text-transform: uppercase;">Total Piutang Kasbon</p>
+          <p style="margin:0 0 5px; color:var(--text-gray); font-size: 11px; font-weight: bold; text-transform: uppercase;">Total Piutang Kasbon</p>
           <h3 style="color:var(--accent-red);" id="lblNeracaPiutang">Memuat...</h3>
           <p style="font-size:11px; color:#555; margin-top:8px;">*Total uang CV yang belum dipotong dari pegawai (Akumulasi keseluruhan).</p>
         </div>
     </div>
     
     <div class="grid-form" style="margin-top:20px;">
-        <div class="neraca-box biru" style="background: linear-gradient(145deg, #13243f, #1e3a8a); border: none; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);">
+        <div class="neraca-box biru" style="border: none; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);">
           <p style="margin:0 0 5px; color:#93c5fd; font-size: 13px; font-weight: bold; text-transform: uppercase;">Saldo Kas & Bank Ril (Uang Fisik)</p>
           <h3 style="color:white; font-size:30px; text-shadow: 2px 2px 5px rgba(0,0,0,0.5);" id="lblNeracaFisik">Memuat...</h3>
           <p style="font-size:11px; color:#bfdbfe; margin-top:10px;">*Rumus: (Laba CV - Gaji Pegawai) - Piutang Kasbon.</p>
         </div>
         
-        <div class="neraca-box kuning" style="background: linear-gradient(145deg, #2a2016, #3f2e13); border: none; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);">
+        <div class="neraca-box kuning" style="border: none; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.3);">
           <p style="margin:0 0 5px; color:#fde047; font-size: 13px; font-weight: bold; text-transform: uppercase;">Total Nilai Aset (Investasi)</p>
           <h3 style="color:var(--accent-yellow); font-size:30px; text-shadow: 2px 2px 5px rgba(0,0,0,0.5);" id="lblNeracaAset">Memuat...</h3>
           <p style="font-size:11px; color:#fef08a; margin-top:10px;">*Akumulasi harga beli seluruh Eskavator & Tronton (Keseluruhan).</p>
@@ -510,6 +605,11 @@ function simpanKasbon() {
 
 function renderRiwayat(jenis) {
   if (jenis) currentRiwayatTab = jenis;
+  
+  const titleEl = document.getElementById('riwayatTitleText');
+  if (titleEl) {
+    titleEl.innerText = currentRiwayatTab === 'gaji' ? 'Daftar Mutasi Gaji' : 'Daftar Mutasi Kasbon';
+  }
   
   const t1 = parseTanggalAman(document.getElementById('riwayatMulai').value);
   const t2 = parseTanggalAman(document.getElementById('riwayatAkhir').value);
