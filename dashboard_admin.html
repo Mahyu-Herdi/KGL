@@ -53,7 +53,10 @@ input[type="password"]:focus, input[type="text"]:focus, input[type="number"]:foc
 .btn-red { background: var(--accent-maroon) !important; color: white !important; }
 .btn-white { background: #2a2a2a !important; color: white !important; }
 
-#dash { display: none; padding: clamp(15px, 4vw, 50px) clamp(15px, 5vw, 60px); max-width: 1440px; margin: 0 auto; position: relative; z-index: 2; width: 100%; box-sizing: border-box; }
+#dash { display: none; padding: 15px; max-width: 100%; margin: 0; position: relative; z-index: 2; width: 100%; box-sizing: border-box; }
+@media (min-width: 768px) {
+  #dash { padding: 30px 40px; }
+}
 .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid #333; padding-bottom: 15px;}
 .header-title h1 { color: var(--accent-yellow); font-size: 26px; text-transform: uppercase; margin-bottom: 5px; }
 .header-actions { display: flex; gap: 10px; flex-wrap: wrap; width: 100%; margin-top: 5px; }
