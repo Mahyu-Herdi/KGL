@@ -6,6 +6,7 @@
 <title>Eskavator Tracker - CV Kembar Group</title>
 <link rel="manifest" href="/manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <style>
 :root { 
 --bg-dark: #121212; 
@@ -719,8 +720,7 @@ function dapatkanWatermark(file, op, kn, lokasiManual, callback) {
 }
 
 function prosesCanvas(file, op, kn, lokasiManual, gpsStr, callback) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
+    const prosesDataUrl = (dataUrl) => {
         const img = new Image();
         img.onload = function() {
             const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
@@ -747,10 +747,32 @@ function prosesCanvas(file, op, kn, lokasiManual, gpsStr, callback) {
             ctx.fillStyle = "#ffffff"; txt.forEach((t, i) => ctx.fillText(t, 35, canvas.height - (fs*4 + 20) + (i*fs*1.3)));
             
             callback(canvas.toDataURL('image/jpeg', 0.75), lokasiManual);
+        };
+        img.onerror = function() {
+            Swal.fire('Error', 'Gagal memproses gambar. Format tidak didukung atau file rusak.', 'error');
+        };
+        img.src = dataUrl;
+    };
+
+    if (file.type === "image/heic" || file.type === "image/heif" || file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif")) {
+        if (typeof heic2any !== "undefined") {
+            heic2any({ blob: file, toType: "image/jpeg", quality: 0.75 }).then((res) => {
+                const finalBlob = Array.isArray(res) ? res[0] : res;
+                const reader = new FileReader();
+                reader.onload = function(e) { prosesDataUrl(e.target.result); };
+                reader.readAsDataURL(finalBlob);
+            }).catch((err) => {
+                console.error("HEIC Error:", err);
+                Swal.fire('Format Gambar Tidak Didukung', 'Mohon ubah setting kamera iPhone Anda ke "Most Compatible" (Bawaan) atau gunakan foto JPG/PNG biasa.', 'error');
+            });
+        } else {
+            Swal.fire('Format Gambar Tidak Didukung', 'Foto dari iPhone (.HEIC) belum didukung secara penuh. Gunakan format JPG/PNG.', 'error');
         }
-        img.src = e.target.result;
+    } else {
+        const reader = new FileReader();
+        reader.onload = function(e) { prosesDataUrl(e.target.result); };
+        reader.readAsDataURL(file);
     }
-    reader.readAsDataURL(file);
 }
 
 function kirimAktivitas(aksi, armada) {
