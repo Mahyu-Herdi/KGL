@@ -713,7 +713,7 @@ function dapatkanWatermark(file, op, kn, lokasiManual, callback) {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (pos) => prosesCanvas(file, op, kn, lokasiManual, `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`, callback),
-            () => prosesCanvas(file, op, kn, lokasiManual, "GPS Tdk Aktif", callback), { enableHighAccuracy: true, timeout: 10000 }
+            () => prosesCanvas(file, op, kn, lokasiManual, "GPS Tdk Aktif", callback), { enableHighAccuracy: true, timeout: 5000 }
         );
     } else prosesCanvas(file, op, kn, lokasiManual, "No GPS", callback);
 }
@@ -724,13 +724,29 @@ function prosesCanvas(file, op, kn, lokasiManual, gpsStr, callback) {
         const img = new Image();
         img.onload = function() {
             const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-            canvas.width = img.width; canvas.height = img.height; ctx.drawImage(img, 0, 0);
-            const fs = Math.max(22, canvas.width * 0.032); ctx.font = `500 ${fs}px sans-serif`; 
+            
+            const MAX_WIDTH = 1024;
+            let width = img.width;
+            let height = img.height;
+            if (width > height && width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+            } else if (height > MAX_WIDTH) {
+                width *= MAX_WIDTH / height;
+                height = MAX_WIDTH;
+            }
+            
+            canvas.width = width; canvas.height = height; 
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            const fs = Math.max(16, canvas.width * 0.035); ctx.font = `500 ${fs}px sans-serif`; 
             const txt = [`Waktu: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID')}`, `Lokasi: ${lokasiManual}`, `GPS: ${gpsStr}`, `Ptg: ${op} | ${kn}`];
-            ctx.fillStyle = "rgba(0, 0, 0, 0.65)"; ctx.fillRect(20, canvas.height - (fs*4 + 40), 500, fs*4 + 20);
+            
+            const boxWidth = Math.min(width * 0.9, 500);
+            ctx.fillStyle = "rgba(0, 0, 0, 0.65)"; ctx.fillRect(20, canvas.height - (fs*4 + 40), boxWidth, fs*4 + 20);
             ctx.fillStyle = "#ffffff"; txt.forEach((t, i) => ctx.fillText(t, 35, canvas.height - (fs*4 + 20) + (i*fs*1.3)));
             
-            callback(canvas.toDataURL('image/jpeg', 0.85), lokasiManual);
+            callback(canvas.toDataURL('image/jpeg', 0.75), lokasiManual);
         }
         img.src = e.target.result;
     }
