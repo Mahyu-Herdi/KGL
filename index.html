@@ -429,9 +429,21 @@ div:where(.swal2-title) { color: var(--accent-yellow) !important; font-size: 20p
 <!-- Modal Kamera Web -->
 <div id="kameraModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9999; flex-direction: column; align-items: center; justify-content: center;">
     <video id="kameraVideo" autoplay playsinline style="width: 100%; max-height: 80vh; object-fit: contain;"></video>
-    <div style="position: absolute; bottom: 30px; display: flex; gap: 20px;">
-        <button onclick="tutupKamera()" style="padding: 15px 30px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Batal</button>
-        <button onclick="jepretKamera()" style="padding: 15px 30px; background: #fff; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Jepret</button>
+    <div style="position: absolute; bottom: 40px; width: 100%; display: flex; align-items: center; justify-content: space-around; padding: 0 20px; box-sizing: border-box;">
+        <button onclick="tutupKamera()" style="background: none; color: white; border: none; font-size: 18px; cursor: pointer; padding: 10px;">Batal</button>
+        
+        <div onclick="jepretKamera()" style="width: 70px; height: 70px; border-radius: 50%; border: 4px solid white; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 2px; box-sizing: border-box;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.95)'" ontouchend="this.style.transform='scale(1)'">
+            <div style="width: 100%; height: 100%; border-radius: 50%; background: white;"></div>
+        </div>
+
+        <button onclick="gantiKamera()" style="background: none; color: white; border: none; cursor: pointer; padding: 10px; display: flex; align-items: center; justify-content: center;" title="Ganti Kamera">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                <path d="M16 21v-5h5"></path>
+            </svg>
+        </button>
     </div>
 </div>
 <canvas id="kameraCanvas" style="display: none;"></canvas>
@@ -439,13 +451,20 @@ div:where(.swal2-title) { color: var(--accent-yellow) !important; font-size: 20p
 <script>
 let currentInputIdKamera = "";
 let streamKamera = null;
+let currentFacingMode = 'environment';
 
 function bukaKameraWeb(idInput) {
     currentInputIdKamera = idInput;
     document.getElementById('kameraModal').style.display = 'flex';
-    
-    // Request camera
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    currentFacingMode = 'environment';
+    mulaiStreamKamera();
+}
+
+function mulaiStreamKamera() {
+    if (streamKamera) {
+        streamKamera.getTracks().forEach(track => track.stop());
+    }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
         .then(stream => {
             streamKamera = stream;
             document.getElementById('kameraVideo').srcObject = stream;
@@ -454,6 +473,11 @@ function bukaKameraWeb(idInput) {
             Swal.fire('Error', 'Tidak dapat mengakses kamera: ' + err.message, 'error');
             tutupKamera();
         });
+}
+
+function gantiKamera() {
+    currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+    mulaiStreamKamera();
 }
 
 function tutupKamera() {
