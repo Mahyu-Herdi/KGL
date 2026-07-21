@@ -426,7 +426,68 @@ div:where(.swal2-title) { color: var(--accent-yellow) !important; font-size: 20p
     </div>
 </div> 
 
+<!-- Modal Kamera Web -->
+<div id="kameraModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9999; flex-direction: column; align-items: center; justify-content: center;">
+    <video id="kameraVideo" autoplay playsinline style="width: 100%; max-height: 80vh; object-fit: contain;"></video>
+    <div style="position: absolute; bottom: 30px; display: flex; gap: 20px;">
+        <button onclick="tutupKamera()" style="padding: 15px 30px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Batal</button>
+        <button onclick="jepretKamera()" style="padding: 15px 30px; background: #fff; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Jepret</button>
+    </div>
+</div>
+<canvas id="kameraCanvas" style="display: none;"></canvas>
+
 <script>
+let currentInputIdKamera = "";
+let streamKamera = null;
+
+function bukaKameraWeb(idInput) {
+    currentInputIdKamera = idInput;
+    document.getElementById('kameraModal').style.display = 'flex';
+    
+    // Request camera
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(stream => {
+            streamKamera = stream;
+            document.getElementById('kameraVideo').srcObject = stream;
+        })
+        .catch(err => {
+            Swal.fire('Error', 'Tidak dapat mengakses kamera: ' + err.message, 'error');
+            tutupKamera();
+        });
+}
+
+function tutupKamera() {
+    if (streamKamera) {
+        streamKamera.getTracks().forEach(track => track.stop());
+        streamKamera = null;
+    }
+    document.getElementById('kameraModal').style.display = 'none';
+    currentInputIdKamera = "";
+}
+
+function jepretKamera() {
+    const video = document.getElementById('kameraVideo');
+    const canvas = document.getElementById('kameraCanvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    canvas.toBlob(blob => {
+        const file = new File([blob], "jepretan_kamera.jpg", { type: "image/jpeg" });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        
+        const input = document.getElementById(currentInputIdKamera);
+        input.files = dataTransfer.files;
+        
+        // trigger onchange
+        const event = new Event('change');
+        input.dispatchEvent(event);
+        
+        tutupKamera();
+    }, 'image/jpeg', 0.9);
+}
+
 // PASTIKAN LINK INI SAMA DENGAN DEPLOY TERBARU KAMU
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw6H0zUU7UzVg7iOXRbf5nOoL3qLr6gWVofMnxLVAGNzGRtLCxbKCmdbNdkFp36YN7ZNw/exec";
 
@@ -580,8 +641,13 @@ function pilihSumberFoto(idInput) {
         confirmButtonColor: 'var(--accent-yellow)', cancelButtonColor: '#ef4444'
     }).then((result) => {
         const input = document.getElementById(idInput);
-        if (result.isConfirmed) { input.setAttribute('capture', 'environment'); input.click(); } 
-        else if (result.isDenied) { input.removeAttribute('capture'); input.click(); }
+        if (result.isConfirmed) { 
+            bukaKameraWeb(idInput);
+        } 
+        else if (result.isDenied) { 
+            input.removeAttribute('capture'); 
+            input.click(); 
+        }
     });
 }
 
