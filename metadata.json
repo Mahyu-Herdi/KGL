@@ -1,0 +1,6 @@
+{
+  "name": "Eskavator Tracker",
+  "description": "Aplikasi tracker operasional eskavator dan tronton CV Kembar Group dengan dashboard admin dan payroll",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
