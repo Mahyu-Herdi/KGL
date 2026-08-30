@@ -4,8 +4,20 @@
     { "src": "server.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/(icon\\.png|kop-surat\\.png|manifest\\.json|sw\\.js)", "dest": "/$1" },
     { "src": "/(.*)", "dest": "server.js" }
-  ]
+  ],
+  "functions": {
+    "server.js": {
+      "includeFiles": [
+        "icon.png",
+        "kop-surat.png",
+        "manifest.json",
+        "sw.js",
+        "index.html",
+        "dashboard_admin.html",
+        "payroll.html"
+      ]
+    }
+  }
 }
 
