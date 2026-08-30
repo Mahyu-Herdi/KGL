@@ -9,7 +9,6 @@ const app = express();
 const PORT = 3000;
 
 // Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname));
 
 // Explicit route fallbacks
