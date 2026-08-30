@@ -4,6 +4,8 @@
     { "src": "server.js", "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/(icon\\.png|kop-surat\\.png|manifest\\.json|sw\\.js)", "dest": "/$1" },
     { "src": "/(.*)", "dest": "server.js" }
   ]
 }
+
